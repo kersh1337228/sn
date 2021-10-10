@@ -38,6 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'user.apps.UserConfig',
+    'user_note.apps.UserNoteConfig',
+    'user_media.apps.UserMediaConfig',
+    'user_friend.apps.UserFriendConfig',
+    'user_chat.apps.UserChatConfig',
+    'user_community.apps.UserCommunityConfig',
 ]
 
 MIDDLEWARE = [
@@ -100,6 +107,10 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+'''Own user model instead of built-in one'''
+AUTH_USER_MODEL = 'user.User'
 
 
 # Internationalization
