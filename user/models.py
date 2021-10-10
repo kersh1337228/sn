@@ -11,7 +11,7 @@ users database entries.
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from phonenumber_field.modelfields import PhoneNumberField
-from additional_databases.add_dbs import get_cities, get_countries, \
+from .additional_databases.add_dbs import get_cities, get_countries, \
     get_languages, get_universities
 
 
@@ -20,24 +20,23 @@ Customised user-manager, replacing built-in
 Django user-manager and extending it's functional.
 '''
 class UserManager(BaseUserManager):
-    def create_user(self, **kwargs):
+    def create_user(self, password=None, **kwargs):
+        kwargs['email'] = self.normalize_email(kwargs['email'])
         user = self.model(**kwargs)
-        user.set_password(kwargs['password'])
+        user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_staffuser(self, **kwargs):
-        user = self.model(**kwargs)
+    def create_staffuser(self, password, **kwargs):
+        user = self.create_user(password=password, **kwargs)
         user.staff = True
-        user.set_password(kwargs['password'])
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, **kwargs):
-        user = self.model(**kwargs)
+    def create_superuser(self, password, **kwargs):
+        user = self.create_user(password=password, **kwargs)
         user.staff = True
         user.admin = True
-        user.set_password(kwargs['password'])
         user.save(using=self._db)
         return user
 
@@ -82,6 +81,7 @@ class User(AbstractBaseUser):
     )
     gender = models.CharField(
         verbose_name='Gender',
+        max_length=7,
         null=False,
         blank=False,
         choices=[
@@ -98,6 +98,8 @@ class User(AbstractBaseUser):
     personal_information = models.OneToOneField(
         'UserData',
         auto_created=True,
+        null=True,
+        blank=True,
         on_delete=models.CASCADE,
     )
     is_public = models.BooleanField(
@@ -115,7 +117,13 @@ class User(AbstractBaseUser):
     admin = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'phone_number'
-    REQUIRED_FIELDS = ['phone_number', 'first_name', 'last_name', 'gender', 'birthdate']
+    REQUIRED_FIELDS = ['email', 'first_name', 'last_name', 'gender', 'birthdate']
+
+    object = UserManager()
+
+    def save(self, *args, **kwargs):
+        super(User, self).save(*args, **kwargs)
+        self.user_id = self.email.split('@')[0].lower()
 
     def get_absolute_url(self):
         return self.user_id
@@ -192,27 +200,32 @@ Basic user data which allows
 to identify the person.
 '''
 class UserBasicData(models.Model):
+    cities_list = [(city['name'], city['name']) for city in get_cities()]
+    languages_list = [(language['name'], language['name']) for language in get_languages()]
     current_city = models.CharField(
         verbose_name='Current city',
+        max_length=255,
         null=True,
         blank=True,
         default=None,
-        choices=get_cities(),
+        choices=cities_list,
     )
     languages = models.CharField(
         verbose_name='Languages',
+        max_length=255,
         null=True,
         blank=True,
         default=None,
-        choices=get_languages(),
+        choices=languages_list,
     )
     company = models.CharField(
         verbose_name='Company',
+        max_length=255,
         null=True,
         blank=True,
         default=None,
     )
-    relationship = models.NullBooleanField(
+    relationship = models.BooleanField(
         verbose_name='Relationship',
         null=True,
         blank=True,
@@ -230,19 +243,23 @@ User contact data, allowing to contact person
 or to find his page on another platforms.
 '''
 class UserContactData(models.Model):
+    countries_list = [(country['name'], country['name']) for country in get_countries()]
+    cities_list = [(city['name'], city['name']) for city in get_cities()]
     country = models.CharField(
         verbose_name='Country',
+        max_length=255,
         null=True,
         blank=True,
         default=None,
-        choices=get_countries(),
+        choices=countries_list,
     )
     city = models.CharField(
         verbose_name='Country',
+        max_length=255,
         null=True,
         blank=True,
         default=None,
-        choices=[city for city in get_cities() if city[0]['country_id'] == country],
+        choices=cities_list,
     )
     alternative_phone_number = PhoneNumberField(
         verbose_name='Alternative phone-number',
@@ -342,18 +359,21 @@ class UserInterests(models.Model):
 
 '''Information about user's secondary and higher education'''
 class UserEducation(models.Model):
+    universities_list = [(university['name'], university['name']) for university in get_universities()]
     education_secondary = models.CharField(
         verbose_name='Secondary education',
+        max_length=255,
         null=True,
         blank=True,
         default=None,
     )
     education_higher = models.CharField(
         verbose_name='Higher education',
+        max_length=255,
         null=True,
         blank=True,
         default=None,
-        choices=get_universities(),
+        choices=universities_list,
     )
 
 

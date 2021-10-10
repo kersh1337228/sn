@@ -14,14 +14,13 @@ Uses 'cities.csv' file data.
 def get_cities():
     # Creating cities list
     city_list = []
-    cities = csv.reader(open('cities.csv', 'r', newline=''), delimiter=';')
+    cities = csv.reader(open('user/additional_databases/cities.csv', 'r', newline=''), delimiter=';')
     for city in list(cities)[1:]:
-        city_data = {
+        city_list.append({
             'name': city[2],
             'city_id': int(city[0]),
             'country_id': int(city[1]),
-        }
-        city_list.append((city_data, city_data['name']))
+        })
     return city_list
 
 
@@ -33,14 +32,13 @@ def get_countries():
     #Creating countries list
     country_list = []
     city_list = get_cities()
-    countries = csv.reader(open('countries.csv', 'r', newline=''), delimiter=';')
+    countries = csv.reader(open('user/additional_databases/countries.csv', 'r', newline=''), delimiter=';')
     for country in list(countries)[1:]:
-        country_data = {
+        country_list.append({
             'name': country[1],
             'country_id': int(country[0]),
-            'city_list': [city[0] for city in city_list if city[0]['country_id'] == int(country[0])],
-        }
-        country_list.append((country_data, country_data['name']))
+            'city_list': [city for city in city_list if city['country_id'] == int(country[0])],
+        })
     return country_list
 
 
@@ -51,13 +49,12 @@ Uses 'languages.csv' file data.
 def get_languages():
     #Creating language list
     language_list = []
-    languages = csv.reader(open('languages.csv', 'r', newline=''), delimiter=',')
+    languages = csv.reader(open('user/additional_databases/languages.csv', 'r', newline='', encoding='utf'), delimiter=',')
     for language in list(languages)[1:]:
-        language_data = {
+        language_list.append({
             'name': language[3],
             'language_id': language[0],
-        }
-        language_list.append((language_data, language_data['name']))
+        })
     return language_list
 
 
@@ -68,12 +65,11 @@ Uses 'universities.csv' file data.
 def get_universities():
     #Creating university list
     university_list = []
-    universities = csv.reader(open('universities.csv', 'r', newline=''), delimiter=',')
+    universities = csv.reader(open('user/additional_databases/universities.csv', 'r', newline=''), delimiter=',')
     for university in universities:
-        university_data = {
+        university_list.append({
             'name': university[1],
             'country': university[0],
             'site_url': university[2],
-        }
-        university_list.append((university_data, university_data['name']))
+        })
     return university_list
