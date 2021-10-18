@@ -1,0 +1,150 @@
+html, body {
+    background: rgb(39, 40, 34);
+
+    padding: 0 0;
+    margin: 0 0;
+
+    font-family: "SF UI Display";
+}
+
+a, a:active, a:visited {
+    color: white;
+    text-decoration: none;
+}
+
+textarea {
+    outline: none;
+    resize: none;
+    border: none;
+    overflow: no-display;
+
+    background: rgba(0, 0, 0, 0);
+    color: white;
+
+    width: 100%;
+}
+
+.navigation_bar_upper {
+    position: fixed;
+    display: flex;
+
+    background: rgba(19, 20, 14, 0.8);
+    backdrop-filter: blur(7px);
+    width: 100%;
+
+    z-index: 2;
+}
+
+.navigation_bar_upper_list {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    width: 100%;
+    padding: 0 34%;
+
+    color: white;
+}
+
+.navigation_bar_upper_list li {
+    list-style: none;
+}
+
+.content {
+    display: grid;
+    position: absolute;
+
+    color: white;
+
+    margin: 5% 34% 5% 34%;
+    width: 32%;
+    height: 100%;
+    padding: 0 0;
+    min-width: 120px;
+    min-height: 390px;
+
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: 30% auto 65%;
+    grid-gap: 35px 35px;
+
+    z-index: 1;
+}
+
+.grid_cell_profile_actions {
+    width: 100%;
+    height: 100%;
+    background: rgb(60, 60, 60);
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start: 1;
+    grid-row-end: 2;
+}
+
+.grid_cell_profile_actions_profile_picture {
+    padding: 10px 10px 10px 10px;
+
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    margin: -10px -10px -10px -10px;
+}
+
+.grid_cell_profile_actions_profile_picture img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.grid_cell_profile_actions_edit_button {
+    background: rgb(90, 90, 90);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 15% 0 0 0;
+    text-align: center;
+
+    transition: background 0.7s;
+}
+
+.grid_cell_profile_actions_edit_button:hover {
+    background: rgb(100, 100, 100);
+}
+
+.grid_cell_personal_data {
+    width: 100%;
+    height: 100%;
+    background: rgb(50, 50, 50);
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+    grid-column-start: 2;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 1;
+}
+
+.grid_cell_add_note {
+    width: 100%;
+    height: 100%;
+    background: rgb(50, 50, 50);
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 2;
+    grid-row-end: 2;
+}
+
+.grid_cell_note_list {
+    width: 100%;
+    height: 100%;
+    background: rgb(50, 50, 50);
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 3;
+}

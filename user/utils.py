@@ -1,11 +1,28 @@
 '''
 Additional functions and mixins
 '''
-from django.contrib.auth import get_user_model
+import re
+from django.core.exceptions import ValidationError
 
 
+'''
+Mixin class for user-app views,
+contains template content getter
+'''
 class UserViewMixin():
     def get_user_context(self, **kwargs):
         context = kwargs
-        context['user'] = get_user_model()
         return context
+
+
+'''
+Name validator for form 
+first name and last name fields
+'''
+def validate_name(name, field):
+    name_regular = r'^[A-ZА-Я]{1}[a-zа-я]+$'
+    if not re.match(name_regular, name):
+        raise ValidationError(
+                f'Wrong {field} format',
+                code='wrong_name',
+            )

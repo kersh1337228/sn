@@ -23,7 +23,10 @@
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
     <option name="TEMPLATE_FOLDERS">
       <list>
-        <option value="$MODULE_DIR$/../Socialize\templates" />
+        <option value="$MODULE_DIR$/templates" />
+        <option value="$MODULE_DIR$/user/templates" />
+        <option value="$MODULE_DIR$/user_community/templates" />
+        <option value="$MODULE_DIR$/user_note/templates" />
       </list>
     </option>
   </component>

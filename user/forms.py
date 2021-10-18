@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from phonenumber_field.formfields import validate_international_phonenumber
+from user.utils import validate_name
 
 
 User = get_user_model()
@@ -26,16 +27,50 @@ class UserRegisterForm(UserCreationForm):
             'is_public',
         ]
         widgets = {
-            'phone_number' : forms.TextInput(attrs={'class': 'form-input'}),
-            'email': forms.EmailInput(attrs={'class': 'form-input'}),
-            'password1': forms.PasswordInput(attrs={'class': 'form-input'}),
-            'password2': forms.PasswordInput(attrs={'class': 'form-input'}),
-            'first_name': forms.TextInput(attrs={'class': 'form-input'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-input'}),
-            'gender': forms.Select(attrs={'class': 'form-input'}),
-            'birthdate': forms.DateInput(attrs={'class': 'form-input'}),
-            'is_public': forms.Select(attrs={'class': 'form-input'}),
+            'phone_number' : forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'email': forms.EmailInput(
+                attrs={'class': 'form-input'}
+            ),
+            'password1': forms.PasswordInput(
+                attrs={'class': 'form-input'}
+            ),
+            'password2': forms.PasswordInput(
+                attrs={'class': 'form-input'}
+            ),
+            'first_name': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'last_name': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'gender': forms.Select(
+                attrs={'class': 'form-input'}
+            ),
+            'birthdate': forms.SelectDateWidget(
+                attrs={'class': 'form-input'},
+                years= [str(year) for year in range(1940, 2004)]
+            ),
+            'is_public': forms.Select(
+                attrs={'class': 'form-input'}
+            ),
         }
+
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data.get('phone_number')
+        validate_international_phonenumber(phone_number)
+        return phone_number
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        validate_name(first_name, 'first name')
+        return first_name
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        validate_name(last_name, 'last name')
+        return last_name
 
 
 '''
@@ -82,7 +117,7 @@ class AuthenticationForm(forms.Form):
         # Checking if email address or phone number is entered
         if '@' in username:
             validate_email(username)
-            username = User.all().filter(email=username).phone_number
+            username = User.objects.get(email=username).phone_number
         else:
             validate_international_phonenumber(username)
 

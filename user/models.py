@@ -41,11 +41,17 @@ class UserManager(BaseUserManager):
         return user
 
 
+'''Function to create path for media uploading'''
+def upload_to_profile_picture(instance, filename):
+    return f'{instance.user_id}/images/profile_pictures/%Y/%m/%d/{filename}'
+
+
 '''
 Customised user-model, replacing built-in
 Django user-model and extending it's functional.
 '''
 class User(AbstractBaseUser):
+    objects = UserManager()
     '''User authentication data'''
     phone_number = PhoneNumberField(
         verbose_name='Phone-number',
@@ -105,12 +111,43 @@ class User(AbstractBaseUser):
             (False, 'Private'),
         ]
     )
-
+    '''Friends'''
+    friends = models.ManyToManyField(
+        'self',
+        through='UserFriend',
+        related_name='friends',
+    )
+    '''Subscriptions'''
+    user_subscribes = models.ManyToManyField(
+        'self',
+        through='Subscriber',
+        symmetrical=False,
+        related_name='followers'
+    )
+    community_subscribes = models.ManyToManyField(
+        'user_community.Community',
+        through='user_community.CommunitySubscriber',
+        symmetrical=False,
+        related_name='community_subscribes',
+    )
     '''User Personal Data'''
-
     '''User Basic Data'''
-    cities_list = [(city['name'], city['name']) for city in get_cities()]
-    languages_list = [(language['name'], language['name']) for language in get_languages()]
+    profile_picture = models.ImageField(
+        upload_to=upload_to_profile_picture,
+        blank=True,
+    )
+    cities_list = [
+        (
+            city['name'],
+            city['name']
+        ) for city in get_cities()
+    ]
+    languages_list = [
+        (
+            language['name'],
+            language['name']
+        ) for language in get_languages()
+    ]
     current_city = models.CharField(
         verbose_name='Current city',
         max_length=255,
@@ -147,8 +184,18 @@ class User(AbstractBaseUser):
     )
 
     '''User Contact Data'''
-    countries_list = [(country['name'], country['name']) for country in get_countries()]
-    cities_list = [(city['name'], city['name']) for city in get_cities()]
+    countries_list = [
+        (
+            country['name'],
+            country['name']
+        ) for country in get_countries()
+    ]
+    cities_list = [
+        (
+            city['name'],
+            city['name']
+        ) for city in get_cities()
+    ]
     country = models.CharField(
         verbose_name='Country',
         max_length=255,
@@ -255,7 +302,12 @@ class User(AbstractBaseUser):
     )
 
     '''User Education'''
-    universities_list = [(university['name'], university['name']) for university in get_universities()]
+    universities_list = [
+        (
+            university['name'],
+            university['name']
+        ) for university in get_universities()
+    ]
     education_secondary = models.CharField(
         verbose_name='Secondary education',
         max_length=255,
@@ -313,18 +365,31 @@ class User(AbstractBaseUser):
         ],
     )
 
-    is_active = models.BooleanField(default=True)
-    staff = models.BooleanField(default=False)
-    admin = models.BooleanField(default=False)
+    is_active = models.BooleanField(
+        default=True
+    )
+    staff = models.BooleanField(
+        default=False
+    )
+    admin = models.BooleanField(
+        default=False
+    )
 
     USERNAME_FIELD = 'phone_number'
-    REQUIRED_FIELDS = ['email', 'first_name', 'last_name', 'gender', 'birthdate']
+    REQUIRED_FIELDS = [
+        'email',
+        'first_name',
+        'last_name',
+        'gender',
+        'birthdate',
+    ]
 
     object = UserManager()
 
     def save(self, *args, **kwargs):
+        if not self.user_id:
+            self.user_id = self.email.split('@')[0].lower().replace('.', '_')
         super(User, self).save(*args, **kwargs)
-        self.user_id = self.email.split('@')[0].lower()
 
     def get_absolute_url(self):
         return self.user_id
@@ -356,3 +421,20 @@ class User(AbstractBaseUser):
         verbose_name = 'User'
         verbose_name_plural = 'Users'
         ordering = ['last_name', 'first_name']
+
+
+'''
+Subscriber model, realizing 
+user-to-user subscription model.
+'''
+class Subscriber(models.Model):
+    subscriber = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='following_user',
+    )
+    subscribed_to_user = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='follower',
+    )

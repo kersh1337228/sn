@@ -3,6 +3,37 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-    {{ user.first_name }}
-    {# User page here... #}
+    <div class="grid_cell_profile_actions">
+        <div class="grid_cell_profile_actions_profile_picture">
+            <img src="{{ user.profile_picture.url }}" alt="">
+        </div>
+        <a href="a">
+            <div class="grid_cell_profile_actions_edit_button">Edit</div>
+        </a>
+    </div>
+    <div class="grid_cell_personal_data">
+        {{ user.first_name }} {{ user.last_name }}
+    </div>
+    <div class="grid_cell_add_note">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.text }}
+            {{ form.images }}
+            {{ form.videos }}
+            {{ form.audios }}
+            {{ form.files }}
+            <button type="submit">Post</button>
+        </form>
+    </div>
+    <div class="grid_cell_note_list">
+        {% if notes %}
+            {% for note in notes %}
+                <div>
+                    {{ note.text }}
+                </div>
+            {% endfor %}
+        {% else %}
+            No posts here
+        {% endif %}
+    </div>
 {% endblock %}

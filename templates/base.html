@@ -5,9 +5,17 @@
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
     <link type="text/css" rel="stylesheet" href="{% static 'style.css' %}">
+    <script type="text/javascript" src="{% static 'jquery-3.6.0.min.js' %}"></script>
 </head>
 <body>
-    <div>{% block content %}{% endblock %}</div>
+    <header class="navigation_bar_upper">
+        <ul class="navigation_bar_upper_list">
+            <li class="navigation_bar_upper_list_index_logo_button">Logo</li>
+            <li class="navigation_bar_upper_list_index_audio_player_panel">Player</li>
+            <li class="navigation_bar_upper_list_index_settings_button">Settings</li>
+        </ul>
+    </header>
+    <div class="content">{% block content %}{% endblock %}</div>
     <script type="text/javascript" src="{% static 'scripts.js' %}"></script>
 </body>
 </html>
