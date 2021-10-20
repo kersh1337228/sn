@@ -3,7 +3,28 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-    {% for note in notes %}
-        {{ note.text }}
-    {% endfor %}
+    <div class="feed_content_grid">
+        <div class="feed_grid_cell_add_note">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.text }}
+                {{ form.images }}
+                {{ form.videos }}
+                {{ form.audios }}
+                {{ form.files }}
+                <button type="submit">Post</button>
+            </form>
+        </div>
+        <div class="feed_grid_cell_note_list">
+            {% if notes %}
+                {% for note in notes %}
+                    <div>
+                        {{ note.text }}
+                    </div>
+                {% endfor %}
+            {% else %}
+                No posts here
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

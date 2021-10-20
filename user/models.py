@@ -114,13 +114,17 @@ class User(AbstractBaseUser):
     '''Friends'''
     friends = models.ManyToManyField(
         'self',
-        through='UserFriend',
+        through='user_friend.Friend',
         related_name='friends',
+    )
+    friend_requests = models.ManyToManyField(
+        'user_friend.UserFriendRequest',
+        related_name='friend_requests',
     )
     '''Subscriptions'''
     user_subscribes = models.ManyToManyField(
         'self',
-        through='Subscriber',
+        through='user_friend.Subscribe',
         symmetrical=False,
         related_name='followers'
     )
@@ -421,20 +425,3 @@ class User(AbstractBaseUser):
         verbose_name = 'User'
         verbose_name_plural = 'Users'
         ordering = ['last_name', 'first_name']
-
-
-'''
-Subscriber model, realizing 
-user-to-user subscription model.
-'''
-class Subscriber(models.Model):
-    subscriber = models.ForeignKey(
-        'User',
-        on_delete=models.CASCADE,
-        related_name='following_user',
-    )
-    subscribed_to_user = models.ForeignKey(
-        'User',
-        on_delete=models.CASCADE,
-        related_name='follower',
-    )

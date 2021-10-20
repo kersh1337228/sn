@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="user_list_content_grid">
+        {% if friend_requests %}
+            {% for request in friend_requests %}
+                <div class="user_list_grid_cell_search_field">Search</div>
+                {% with request.from_user as user %}
+                    <div class="user_list_grid_cell_user_list">
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="">
+                        {% endif %}
+                        {{ user.first_name }} {{ user.last_name }}
+                        <a href="{% url 'friend_requests_result' user_id=user.user_id result='accept' %}">
+                            <div class="grid_cell_profile_actions_edit_button">Accept</div>
+                        </a>
+                        <a href="{% url 'friend_requests_result' user_id=user.user_id result='reject' %}">
+                            <div class="grid_cell_profile_actions_edit_button">Reject</div>
+                        </a>
+                    </div>
+                {% endwith %}
+            {% endfor %}
+        {% else %}
+            <div class="feed_grid_cell_search_field">You have no friend requests yet</div>
+        {% endif %}
+    </div>
+{% endblock %}

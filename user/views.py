@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, TemplateView, FormView
 from user.forms import UserRegisterForm, UserAuthenticationForm
-from user.utils import UserViewMixin
+from user.utils import UserViewMixin, get_user_state
 from user_note.forms import NoteAddForm
 from user_note.models import Note
 
@@ -45,6 +45,11 @@ class UserPageView(UserViewMixin, TemplateView, FormView):
             Q(community__in=user.community_subscribes.all())
         )
         context['user'] = self.get_user_profile()
+        context['authorised_user'] = self.request.user
+        context['authorised_user_state'] = get_user_state(
+            context['user'],
+            context['authorised_user'],
+        )
         return context
 
     def form_valid(self, form):

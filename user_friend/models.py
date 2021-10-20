@@ -1,18 +1,65 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 
 
+User = get_user_model()
+
+
 '''
-UserFriend model, realizing
-user-to-user friend relations
+Subscribe model, realizing 
+user-to-user subscription.
 '''
-class UserFriend(models.Model):
-    friend = models.ForeignKey(
-        'User',
+class Subscribe(models.Model):
+    from_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='following_user',
+    )
+    to_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='followed',
+    )
+
+
+'''
+Friend model, realizing
+user-to-user friend relations.
+'''
+class Friend(models.Model):
+    from_user = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
         related_name='friend_user',
     )
-    friend_to_user = models.ForeignKey(
-        'User',
+    to_user = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
-        related_name='frended_user',
+        related_name='frended',
+    )
+
+
+'''
+FriendRequest model, realizing
+'''
+class UserFriendRequest(models.Model):
+    from_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='request_from',
+    )
+    to_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='request_to',
+    )
+    state = models.BooleanField(
+        max_length=25,
+        null=True,
+        choices=[
+            (None, 'Await'),
+            (True, 'Accepted'),
+            (False, 'Rejected'),
+        ],
+        default=None,
     )
