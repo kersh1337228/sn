@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="form_content_grid">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form_error">{{ form.non_field_errors }}</div>
+            {% for field in form %}
+                <div class="form_error">{{ field.errors }}</div>
+                <label class="form_label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+            {% endfor %}
+            <button type="submit">Enter</button>
+        </form>
+    </div>
+{% endblock %}

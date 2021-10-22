@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="form_content_grid">
+        <ul>
+            <li><a href="{% url 'user_password_change' %}">Change Password</a></li>
+            <li><a href="{% url 'user_main_data_change' %}">Change Main Data</a></li>
+            <li><a href="{% url 'user_basic_data_change' %}">Change Basic Personal Data</a></li>
+            <li><a href="{% url 'user_contact_data_change' %}">Change Contact Data</a></li>
+            <li><a href="{% url 'user_interests_change' %}">Change Interests</a></li>
+            <li><a href="{% url 'user_education_change' %}">Change Education and Specialization Data</a></li>
+            <li><a href="{% url 'user_data_visibility_change' %}">Change Data Visibility</a></li>
+        </ul>
+    </div>
+{% endblock %}

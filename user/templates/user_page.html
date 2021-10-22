@@ -9,7 +9,7 @@
                 <img src="{{ user.profile_picture.url }}" alt="">
             </div>
             {% if authorised_user_state == 'authorized_user_page' %}
-                <a href="edit">
+                <a href="{% url 'user_settings' %}">
                     <div class="grid_cell_profile_actions_edit_button">Edit</div>
                 </a>
             {% elif authorised_user_state == 'friend_user_page' %}

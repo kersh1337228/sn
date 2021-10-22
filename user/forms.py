@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model, authenticate
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from phonenumber_field.formfields import validate_international_phonenumber
@@ -46,14 +46,14 @@ class UserRegisterForm(UserCreationForm):
                 attrs={'class': 'form-input'}
             ),
             'gender': forms.Select(
-                attrs={'class': 'form-input'}
+                attrs={'class': 'form-select'}
             ),
             'birthdate': forms.SelectDateWidget(
-                attrs={'class': 'form-input'},
+                attrs={'class': 'form-select'},
                 years= [str(year) for year in range(1940, 2004)]
             ),
             'is_public': forms.Select(
-                attrs={'class': 'form-input'}
+                attrs={'class': 'form-select'}
             ),
         }
 
@@ -170,3 +170,192 @@ class UserAuthenticationForm(AuthenticationForm):
     '''
     def __init__(self, request=None, *args, **kwargs):
         super().__init__(request=None, *args, **kwargs)
+
+
+'''Form of editing main user account data'''
+class UserMainDataEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            'phone_number',
+            'email',
+            'first_name',
+            'last_name',
+            'gender',
+            'birthdate',
+            'is_public',
+        ]
+        widgets = {
+            'phone_number': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'email': forms.EmailInput(
+                attrs={'class': 'form-input'}
+            ),
+            'first_name': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'last_name': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'gender': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+            'birthdate': forms.SelectDateWidget(
+                attrs={'class': 'form-select'},
+                years=[str(year) for year in range(1940, 2004)]
+            ),
+            'is_public': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+        }
+
+
+'''Form of editing basic personal data'''
+class UserBasicPersonalDataEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            'current_city',
+            'languages',
+            'company',
+            'relationship',
+        ]
+        widgets = {
+            'current_city': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+            'languages': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+            'company': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'relationship': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+        }
+
+
+'''Form of editing user contact data'''
+class UserContactDataEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            'country',
+            'city',
+            'alternative_phone_number',
+            'website',
+            'vk',
+            'instagram',
+            'facebook',
+            'twitter'
+        ]
+        widgets = {
+            'country': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+            'city': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+            'alternative_phone_number': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'website': forms.URLInput(
+                attrs={'class': 'form-input'}
+            ),
+            'vk': forms.URLInput(
+                attrs={'class': 'form-input'}
+            ),
+            'instagram': forms.URLInput(
+                attrs={'class': 'form-input'}
+            ),
+            'facebook': forms.URLInput(
+                attrs={'class': 'form-input'}
+            ),
+            'twitter': forms.URLInput(
+                attrs={'class': 'form-input'}
+            ),
+        }
+
+
+'''Form of editing user interests data'''
+class UserInterestsEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            'activities',
+            'interests',
+            'favorite_music',
+            'favorite_movies',
+            'favorite_books',
+            'favorite_games',
+            'about_me',
+        ]
+        widgets = {
+            'activities': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'interests': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'favorite_music': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'favorite_movies': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'favorite_books': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'favorite_games': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'about_me': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+        }
+
+
+'''Form of editing user education data'''
+class UserEducationAndSpecializationEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            'education_secondary',
+            'education_higher',
+            'specialization',
+        ]
+        widgets = {
+            'education_secondary': forms.TextInput(
+                attrs={'class': 'form-input'}
+            ),
+            'education_higher': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+            'specialization': forms.TextInput(
+                attrs={'class': 'form-input'}
+            )
+        }
+
+
+'''Form of editing user data visibility settings'''
+class UserDataVisibilityEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            'email_visible',
+            'phone_number_visible',
+            'birthdate_visible',
+        ]
+        widgets = {
+            'email_visible': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+            'phone_number_visible': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+            'birthdate_visible': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+        }

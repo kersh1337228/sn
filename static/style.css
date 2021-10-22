@@ -14,6 +14,11 @@ a, a:active, a:visited {
     text-decoration: none;
 }
 
+/*Unorganised lists format*/
+ul li {
+    list-style: none;
+}
+
 /*Textarea format*/
 textarea {
     outline: none;

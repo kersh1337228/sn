@@ -2,7 +2,11 @@
 Additional functions and mixins
 '''
 import re
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
+from django.forms import model_to_dict
+from django.urls import reverse_lazy
+from django.views.generic import FormView
 
 
 '''
@@ -14,6 +18,19 @@ class UserViewMixin():
         context = kwargs
         return context
 
+
+class UserEditMixin(LoginRequiredMixin, UserViewMixin, FormView):
+    template_name = 'user_settings_form.html'
+    success_url = reverse_lazy('user_settings')
+
+    def get_user_context(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial.update(**model_to_dict(self.request.user))
+        return initial
 
 '''
 Name validator for form 

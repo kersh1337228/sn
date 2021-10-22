@@ -328,7 +328,7 @@ class User(AbstractBaseUser):
         choices=universities_list,
     )
 
-    '''User Work'''
+    '''User Specialization'''
     specialization = models.CharField(
         verbose_name='Specialization',
         max_length=255,
