@@ -40,7 +40,8 @@ class Friend(models.Model):
 
 
 '''
-FriendRequest model, realizing
+FriendRequest model, realizing sending 
+friend request before adding to friend list
 '''
 class UserFriendRequest(models.Model):
     from_user = models.ForeignKey(

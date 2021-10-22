@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    Are you sure you want to delete the {{ community.name }} community?
+    <form method="post">
+        {% csrf_token %}
+        <button class="plot_button" type="submit">Delete</button>
+    </form>
+{% endblock %}

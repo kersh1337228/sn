@@ -41,7 +41,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-'''Function to create path for media uploading'''
+'''Function to create path for user profile pictures'''
 def upload_to_profile_picture(instance, filename):
     return f'{instance.user_id}/images/profile_pictures/%Y/%m/%d/{filename}'
 
@@ -126,13 +126,13 @@ class User(AbstractBaseUser):
         'self',
         through='user_friend.Subscribe',
         symmetrical=False,
-        related_name='followers'
+        related_name='user_subscribes_list'
     )
     community_subscribes = models.ManyToManyField(
         'user_community.Community',
         through='user_community.CommunitySubscriber',
         symmetrical=False,
-        related_name='community_subscribes',
+        related_name='community_subscribes_list',
     )
     '''User Personal Data'''
     '''User Basic Data'''
@@ -368,7 +368,7 @@ class User(AbstractBaseUser):
             (False, 'Do not show my birthdate')
         ],
     )
-
+    '''Shows whether user is deleted or not'''
     is_active = models.BooleanField(
         default=True
     )

@@ -10,6 +10,7 @@ from user_friend.models import UserFriendRequest, Friend
 User = get_user_model()
 
 
+'''View of current user friend list'''
 class FriendListView(LoginRequiredMixin, ListView):
     model = User
     template_name = 'friend_list.html'
@@ -19,6 +20,7 @@ class FriendListView(LoginRequiredMixin, ListView):
         return self.request.user.friends.all()
 
 
+'''View of current user friend request list'''
 class FriendRequestListView(LoginRequiredMixin, ListView):
     model = UserFriendRequest
     template_name = 'friend_requests.html'
@@ -28,6 +30,7 @@ class FriendRequestListView(LoginRequiredMixin, ListView):
         return self.request.user.friend_requests.all()
 
 
+'''View of answering on friend request'''
 @login_required
 def friend_request_result(request, user_id, result):
     if request.user.is_active:
@@ -50,6 +53,7 @@ def friend_request_result(request, user_id, result):
         return redirect('error.html', context=context)
 
 
+'''View of sending friend request'''
 @login_required
 def add_friend_view(request, friend_id):
     if request.user.is_active:
@@ -61,10 +65,7 @@ def add_friend_view(request, friend_id):
             )
         friend_request.save()
         Friend.friend_requests.add(friend_request)
-        return redirect(
-            'user_page',
-            friend_id
-        )
+        return redirect('user_page', friend_id)
     else:
         context = {
             'title': 'Error',

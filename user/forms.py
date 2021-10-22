@@ -57,16 +57,19 @@ class UserRegisterForm(UserCreationForm):
             ),
         }
 
+    '''Phone number validation'''
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
         validate_international_phonenumber(phone_number)
         return phone_number
 
+    '''First name validation'''
     def clean_first_name(self):
         first_name = self.cleaned_data.get('first_name')
         validate_name(first_name, 'first name')
         return first_name
 
+    '''Last name validation'''
     def clean_last_name(self):
         last_name = self.cleaned_data.get('last_name')
         validate_name(last_name, 'last name')
@@ -82,11 +85,17 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     '''
-    username = forms.CharField(widget=forms.TextInput(attrs={'autofocus': True}))
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'autofocus': True
+        }),
+    )
     password = forms.CharField(
         label='Password',
         strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password'}),
+        widget=forms.PasswordInput(attrs={
+            'autocomplete': 'current-password'
+        }),
     )
 
     error_messages = {

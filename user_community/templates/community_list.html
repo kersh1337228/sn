@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+        <div class="user_list_content_grid">
+        {% if communities %}
+            <div class="user_list_grid_cell_search_field">Search</div>
+            {% for community in communities %}
+                <div class="user_list_grid_cell_user_list">
+                    {% if community.preview_picture %}
+                        <img src="{{ community.preview_picture.url }}" alt="">
+                    {% endif %}
+                    {{ community.name }}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="feed_grid_cell_search_field">You have no communities yet</div>
+        {% endif %}
+    </div>
+{% endblock %}
