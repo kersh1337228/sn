@@ -28,6 +28,7 @@
         <option value="$MODULE_DIR$/user_community/templates" />
         <option value="$MODULE_DIR$/user_note/templates" />
         <option value="$MODULE_DIR$/user_friend/templates" />
+        <option value="$MODULE_DIR$/user_chat/templates" />
       </list>
     </option>
   </component>

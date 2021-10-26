@@ -6,8 +6,7 @@ allowing to register (sign up),
 authorize (sign in), edit and delete
 users database entries.
 '''
-
-
+import datetime
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from phonenumber_field.modelfields import PhoneNumberField
@@ -43,7 +42,8 @@ class UserManager(BaseUserManager):
 
 '''Function to create path for user profile pictures'''
 def upload_to_profile_picture(instance, filename):
-    return f'{instance.user_id}/images/profile_pictures/%Y/%m/%d/{filename}'
+    now = datetime.datetime.now().strftime('%Y/%m/%d')
+    return f'{instance.user_id}/images/profile_pictures/{now}/{filename}'
 
 
 '''
@@ -52,6 +52,7 @@ Django user-model and extending it's functional.
 '''
 class User(AbstractBaseUser):
     objects = UserManager()
+
     '''User authentication data'''
     phone_number = PhoneNumberField(
         verbose_name='Phone-number',
@@ -111,11 +112,49 @@ class User(AbstractBaseUser):
             (False, 'Private'),
         ]
     )
+
+    '''Notes, reposts and media'''
+    notes = models.ManyToManyField(
+        'user_note.Note',
+        related_name='user_notes'
+    )
+    reposts = models.ManyToManyField(
+        'user_note.Note',
+        related_name='user_reposts'
+    )
+    images = models.ManyToManyField(
+        'user_media.Image',
+        related_name='user_images'
+    )
+    videos = models.ManyToManyField(
+        'user_media.Video',
+        related_name='user_videos'
+    )
+    audios = models.ManyToManyField(
+        'user_media.Audio',
+        related_name='user_audios'
+    )
+    files = models.ManyToManyField(
+        'user_media.File',
+        related_name='user_files'
+    )
+
+    '''Chats'''
+    private_chats = models.ManyToManyField(
+        'user_chat.PrivateChat',
+        related_name='user_private_chats'
+    )
+    group_chats = models.ManyToManyField(
+        'user_chat.GroupChat',
+        related_name='user_group_chats'
+    )
+
     '''Friends'''
     friends = models.ManyToManyField(
         'self',
         through='user_friend.Friend',
-        related_name='friends',
+        symmetrical=False,
+        related_name='friend_list',
     )
     friend_requests = models.ManyToManyField(
         'user_friend.UserFriendRequest',
@@ -131,10 +170,11 @@ class User(AbstractBaseUser):
     community_subscribes = models.ManyToManyField(
         'user_community.Community',
         through='user_community.CommunitySubscriber',
-        symmetrical=False,
         related_name='community_subscribes_list',
     )
+
     '''User Personal Data'''
+
     '''User Basic Data'''
     profile_picture = models.ImageField(
         upload_to=upload_to_profile_picture,

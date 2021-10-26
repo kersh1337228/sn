@@ -283,3 +283,23 @@ and edit/subscribe/add friend buttons*/
     grid-template-rows: auto auto;
     grid-gap: 35px 35px;
 }
+
+.chat_content_grid {
+    display: grid;
+    position: absolute;
+
+    color: white;
+
+    margin: 5% 34% 5% 34%;
+    width: 32%;
+    height: 100%;
+    padding: 0 0;
+    min-width: 120px;
+    min-height: 390px;
+
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    grid-gap: 35px 35px;
+}
+
+

@@ -44,11 +44,8 @@ class UserPageView(LoginRequiredMixin, UserViewMixin, TemplateView, FormView):
         user = self.get_user_profile()
         context = super().get_context_data(**kwargs)
         context['title'] = f'{user.first_name} {user.last_name}'
-        context['notes'] = Note.objects.filter(
-            Q(user=user) |
-            Q(community__in=user.community_subscribes.all())
-        )
-        context['user'] = self.get_user_profile()
+        context['notes'] = user.notes.all() | user.reposts.all()
+        context['user'] = user
         context['authorised_user'] = self.request.user
         context['authorised_user_state'] = get_user_state(
             context['user'],

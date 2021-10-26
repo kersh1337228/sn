@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="chat_content_grid">
+        <div class="chat_content_grid_cell_companion_data">
+            {% if request.user != chat.member_1 %}
+                {{ chat.member_1.first_name }} {{ chat.member_1.last_name }}
+            {% else %}
+                {{ chat.member_2.first_name }} {{ chat.member_2.last_name }}
+            {% endif %}
+        </div>
+        <div class="chat_content_grid_cell_messages">
+            {% for message in chat.messages.all %}
+                {{ message.sender.first_name }} {{ message.sender.last_name }}<br>
+                {{ message.text }}<br>
+                Sent at {{ message.publish_time }}<br>
+                Last updated at {{ message.update_time }}<br>
+            {% endfor %}
+        </div>
+        <div class="chat_content_grid_cell_write_message">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

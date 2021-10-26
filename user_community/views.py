@@ -3,20 +3,31 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView, FormView
 from user_community.forms import CommunityCreateForm, CommunityEditForm
 from user_community.models import Community, CommunitySubscriber, CommunitySubscribeRequest
 from user_community.utils import get_community_state
+from user_note.forms import NoteAddForm
+
 
 User = get_user_model()
 
 
 '''Separate community page view'''
-class CommunityPageView(LoginRequiredMixin, DetailView):
+class CommunityPageView(LoginRequiredMixin, DetailView, FormView):
     model = Community
     template_name = 'community_page.html'
     context_object_name = 'community'
     slug_url_kwarg = 'community_id'
+    form_class = NoteAddForm
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'community_page',
+            kwargs={
+                'community_id': self.kwargs.get('community_id')
+            }
+        )
 
     def get_object(self, queryset=None):
         return get_object_or_404(
@@ -37,6 +48,10 @@ class CommunityPageView(LoginRequiredMixin, DetailView):
             community,
         )
         return context
+    
+    def form_valid(self, form):
+        form.save(community=self.get_object())
+        return super(CommunityPageView, self).form_valid(form)
 
 
 '''View on which the filtered list of communities is shown'''

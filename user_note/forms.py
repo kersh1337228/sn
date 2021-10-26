@@ -1,8 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from user_note.models import Note, NoteImage, NoteVideo,\
-    NoteAudio, NoteFile
+from user_note.models import Note
 from multiupload import fields
+from user_note.utils import note_attach_media
 
 
 User = get_user_model()
@@ -41,58 +41,20 @@ class NoteAddForm(forms.ModelForm):
         files = self.cleaned_data.pop('files')
         if user:
             self.cleaned_data['user'] = user
+            note = Note(**self.cleaned_data)
+            note = note_attach_media(images, 'image', 'user', user, note)
+            note = note_attach_media(videos, 'video', 'user', user, note)
+            note = note_attach_media(audios, 'audio', 'user', user, note)
+            note = note_attach_media(files, 'file', 'user', user, note)
+            note.save()
+            user.notes.add(note)
         else:
             self.cleaned_data['community'] = community
-        if self.cleaned_data.get('user'):
-            for image in images:
-                img = NoteImage(
-                    image=image,
-                    user=self.cleaned_data.get('user'),
-                    note=self.instance
-                )
-                img.save()
-            for video in videos:
-                vid = NoteVideo(
-                    video=video,
-                    user=self.cleaned_data.get('user'),
-                    note=self.instance
-                )
-                vid.save()
-            for audio in audios:
-                aud = NoteAudio(
-                    audio=audio,
-                    user=self.cleaned_data.get('user'),
-                    note=self.instance
-                )
-                aud.save()
-            for file in files:
-                fil = NoteFile(
-                    file=file,
-                    user=self.cleaned_data.get('user'),
-                    note=self.instance
-                )
-                fil.save()
-        else:
-            for image in images:
-                img = NoteImage(
-                    image=image, community=self.cleaned_data.get('community'), note=self.instance
-                )
-                img.save()
-            for video in videos:
-                vid = NoteVideo(
-                    video=video, community=self.cleaned_data.get('community'), note=self.instance
-                )
-                vid.save()
-            for audio in audios:
-                aud = NoteAudio(
-                    audio=audio, community=self.cleaned_data.get('community'), note=self.instance
-                )
-                aud.save()
-            for file in files:
-                fil = NoteFile(
-                    file=file, community=self.cleaned_data.get('community'), note=self.instance
-                )
-                fil.save()
-        note = Note(**self.cleaned_data)
-        note.save()
+            note = Note(**self.cleaned_data)
+            note = note_attach_media(images, 'image', 'community', community, note)
+            note = note_attach_media(videos, 'video', 'community', community, note)
+            note = note_attach_media(audios, 'audio', 'community', community, note)
+            note = note_attach_media(files, 'file', 'community', community, note)
+            note.save()
+            community.notes.add(note)
         return note

@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from .utils import PostMixin
-from user_media.models import Image, Video, Audio, File
 
 
 User = get_user_model()
@@ -24,56 +23,21 @@ class Note(PostMixin, models.Model):
         blank=True,
         default=0
     )
-
-
-'''
-Note image separate model, 
-allowing to upload multiple images to one note.
-'''
-class NoteImage(Image, models.Model):
-    note = models.ForeignKey(
-        'Note',
-        on_delete=models.DO_NOTHING,
-        null=True,
-        blank=True
+    images = models.ManyToManyField(
+        'user_media.Image',
+        related_name='note_images',
     )
-
-
-'''
-Note video model, 
-allowing to upload video files to note.
-'''
-class NoteVideo(Video, models.Model):
-    note = models.ForeignKey(
-        'Note',
-        on_delete=models.DO_NOTHING,
-        null=True,
-        blank=True
+    videos = models.ManyToManyField(
+        'user_media.Video',
+        related_name='note_videos',
     )
-
-
-'''
-Note audio model, 
-allowing to upload audio files to note.
-'''
-class NoteAudio(Audio, models.Model):
-    note = models.ForeignKey(
-        'Note',
-        on_delete=models.DO_NOTHING,
-        null=True,
-        blank=True
+    audios = models.ManyToManyField(
+        'user_media.Audio',
+        related_name='note_audios',
     )
-
-'''
-Note file separate model, 
-allowing to upload multiple files to one note.
-'''
-class NoteFile(File, models.Model):
-    note = models.ForeignKey(
-        'Note',
-        on_delete=models.DO_NOTHING,
-        null=True,
-        blank=True
+    files = models.ManyToManyField(
+        'user_media.File',
+        related_name='note_files',
     )
 
 
@@ -88,6 +52,23 @@ class Comment(PostMixin, models.Model):
         on_delete=models.DO_NOTHING,
         null=True,
         blank=True
+    )
+    '''Media'''
+    images = models.ManyToManyField(
+        'user_media.Image',
+        related_name='comment_images',
+    )
+    videos = models.ManyToManyField(
+        'user_media.Video',
+        related_name='comment_videos',
+    )
+    audios = models.ManyToManyField(
+        'user_media.Audio',
+        related_name='comment_audios',
+    )
+    files = models.ManyToManyField(
+        'user_media.File',
+        related_name='comment_files',
     )
     '''Statistics'''
     replies_amount = models.PositiveIntegerField()

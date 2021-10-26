@@ -52,6 +52,33 @@ class Community(models.Model):
         related_name='subscribe_requests',
     )
 
+    '''Notes, reposts and media'''
+    notes = models.ManyToManyField(
+        'user_note.Note',
+        related_name='community_notes'
+    )
+    reposts = models.ManyToManyField(
+        'user_note.Note',
+        related_name='community_reposts'
+    )
+    images = models.ManyToManyField(
+        'user_media.Image',
+        related_name='community_images'
+    )
+    videos = models.ManyToManyField(
+        'user_media.Video',
+        related_name='community_videos'
+    )
+    audios = models.ManyToManyField(
+        'user_media.Audio',
+        related_name='community_audios'
+    )
+    files = models.ManyToManyField(
+        'user_media.File',
+        related_name='community_files'
+    )
+
+
     '''Community Personal Data'''
 
     '''Community Basic Data'''

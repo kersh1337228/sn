@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="user_list_content_grid">
+        {% if private_chats or group_chats %}
+            <div class="user_list_grid_cell_search_field">Search</div>
+            {% for chat in private_chats %}
+                <a href="{% url 'private_chat' chat_id=chat.chat_id %}">
+                    <div class="user_list_grid_cell_user_list">{{ chat.chat_id }}</div>
+                </a>
+            {% endfor %}
+            {% for chat in group_chats %}
+                <a href="{% url 'group_chat' chat_id=chat.chat_id %}">
+                    <div class="user_list_grid_cell_user_list">{{ chat.chat_id }}</div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <div class="feed_grid_cell_search_field">You have no chats yet</div>
+        {% endif %}
+    </div>
+{% endblock %}
