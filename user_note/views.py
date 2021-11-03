@@ -40,7 +40,6 @@ class NoteListView(ListView, FormView):
         return super(NoteListView, self).form_valid(form)
 
 
-
 '''
 Note adding view on 
 behalf of community

@@ -1,63 +1,41 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load user_tags %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
     <div class="user_page_content_grid">
-        <div class="grid_cell_profile_actions">
-            <div class="grid_cell_profile_actions_profile_picture">
-                {% if user.profile_picture %}
-                    <img src="{{ user.profile_picture.url }}" alt="">
-                {% endif %}
-            </div>
-            {% if authorised_user_state == 'authorized_user_page' %}
-                <a href="{% url 'user_settings' %}">
-                    <div class="grid_cell_profile_actions_edit_button">Edit</div>
-                </a>
-            {% elif authorised_user_state == 'friend_user_page' %}
-                <a href="{% url 'create_private_chat' member_id=user.user_id %}">
-                    <div class="grid_cell_profile_actions_edit_button">Write message</div>
-                </a>
-            {% elif authorised_user_state == 'request_public_user_page' %}
-                <a href="{% url 'create_private_chat' member_id=user.user_id %}">
-                    <div class="grid_cell_profile_actions_edit_button">Write message</div>
-                </a>
-                <div class="grid_cell_profile_actions_edit_button">Request sent</div>
-            {% elif authorised_user_state == 'request_private_user_page' %}
-                <div class="grid_cell_profile_actions_edit_button">Request sent</div>
-            {% elif authorised_user_state == 'public_user_page' %}
-                <a href="{% url 'create_private_chat' member_id=user.user_id %}">
-                    <div class="grid_cell_profile_actions_edit_button">Write message</div>
-                </a>
-                <a href="{% url 'add_friend' friend_id=user.user_id %}">
-                    <div class="grid_cell_profile_actions_edit_button">Add friend</div>
-                </a>
-            {% elif authorised_user_state == 'private_user_page' %}
-                <a href="{% url 'add_friend' friend_id=user.user_id %}">
-                    <div class="grid_cell_profile_actions_edit_button">Add friend</div>
-                </a>
-            {% endif %}
-        </div>
+        {% profile_actions_tag user=user authorised_user_state=authorised_user_state %}
         <div class="grid_cell_personal_data">
             {{ user.first_name }} {{ user.last_name }}
         </div>
         <div class="grid_cell_add_note">
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                {{ form.text }}
-                {{ form.images }}
-                {{ form.videos }}
-                {{ form.audios }}
-                {{ form.files }}
-                <button type="submit">Post</button>
+                <div class="form_error">{{ note_add_form.non_field_errors }}</div>
+                <div class="chat_content_grid_cell_write_message_inner_grid">
+                    {% attach_content_tag %}
+                    {% if note_add_form %}
+                        {% for field in note_add_form %}
+                            <div class="form_error">{{ field.errors }}</div>
+                            {{ field }}
+                        {% endfor %}
+                    {% else %}
+                        {% for field in form %}
+                            <div class="form_error">{{ field.errors }}</div>
+                            {{ field }}
+                        {% endfor %}
+                    {% endif %}
+                    <button type="submit" class="send_message_button" name="note_btn"></button>
+                    <div class="send_message_icon">Post</div>
+                </div>
             </form>
         </div>
         <div class="grid_cell_note_list">
             {% if notes %}
                 {% for note in notes %}
-                    <div>
-                        {{ note.text }}
-                    </div>
+                    {% note_tag user=user note=note comment_add_form=comment_add_form %}
                 {% endfor %}
             {% else %}
                 No posts here

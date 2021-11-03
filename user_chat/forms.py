@@ -1,3 +1,5 @@
+import datetime
+
 from django import forms
 from django.core.exceptions import ValidationError
 from multiupload import fields
@@ -15,10 +17,36 @@ def get_user_friends(instance):
 
 '''SendMessageForm allowing to send messages to other users in chats'''
 class SendMessageForm(forms.ModelForm):
-    images = fields.MultiImageField(min_num=0, max_num=10)
-    videos = fields.MultiMediaField(min_num=0, max_num=10, media_type='video')
-    audios = fields.MultiMediaField(min_num=0, max_num=10, media_type='audio')
-    files = fields.MultiFileField(min_num=0, max_num=10)
+    images = fields.MultiImageField(
+        min_num=0,
+        max_num=10,
+        attrs={
+            'class': 'image-button',
+        },
+    )
+    videos = fields.MultiMediaField(
+        min_num=0,
+        max_num=10,
+        media_type='video',
+        attrs={
+            'class': 'video-button',
+        },
+    )
+    audios = fields.MultiMediaField(
+        min_num=0,
+        max_num=10,
+        media_type='audio',
+        attrs={
+            'class': 'audio-button',
+        },
+    )
+    files = fields.MultiFileField(
+        min_num=0,
+        max_num=10,
+        attrs={
+            'class': 'file-button',
+        },
+    )
 
     class Meta:
         model = Message
@@ -28,8 +56,7 @@ class SendMessageForm(forms.ModelForm):
         widgets = {
             'text': forms.Textarea(
                 attrs={
-                    'cols': 60,
-                    'rows': 3,
+                    'rows': 1,
                     'class': 'form-input',
                     'placeholder': 'Message text here',
                 }

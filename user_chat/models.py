@@ -49,6 +49,13 @@ class Message(models.Model):
         'user_media.File',
         related_name='message_image',
     )
+    message_id = models.SlugField(
+        verbose_name='Message ID',
+        max_length=255,
+        null=False,
+        blank=True,
+        unique=True,
+    )
 
 
 class PrivateChat(models.Model):

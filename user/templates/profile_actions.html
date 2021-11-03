@@ -1,0 +1,34 @@
+<div class="grid_cell_profile_actions">
+    <div class="grid_cell_profile_actions_profile_picture">
+        {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" alt="">
+        {% endif %}
+    </div>
+    {% if authorised_user_state == 'authorized_user_page' %}
+        <a href="{% url 'user_settings' %}">
+            <div class="grid_cell_profile_actions_edit_button">Edit</div>
+        </a>
+    {% elif authorised_user_state == 'friend_user_page' %}
+        <a href="{% url 'create_private_chat' member_id=user.user_id %}">
+            <div class="grid_cell_profile_actions_edit_button">Write message</div>
+        </a>
+    {% elif authorised_user_state == 'request_public_user_page' %}
+        <a href="{% url 'create_private_chat' member_id=user.user_id %}">
+            <div class="grid_cell_profile_actions_edit_button">Write message</div>
+        </a>
+        <div class="grid_cell_profile_actions_edit_button">Request sent</div>
+    {% elif authorised_user_state == 'request_private_user_page' %}
+        <div class="grid_cell_profile_actions_edit_button">Request sent</div>
+    {% elif authorised_user_state == 'public_user_page' %}
+        <a href="{% url 'create_private_chat' member_id=user.user_id %}">
+            <div class="grid_cell_profile_actions_edit_button">Write message</div>
+        </a>
+        <a href="{% url 'add_friend' friend_id=user.user_id %}">
+            <div class="grid_cell_profile_actions_edit_button">Add friend</div>
+        </a>
+    {% elif authorised_user_state == 'private_user_page' %}
+        <a href="{% url 'add_friend' friend_id=user.user_id %}">
+            <div class="grid_cell_profile_actions_edit_button">Add friend</div>
+        </a>
+    {% endif %}
+</div>

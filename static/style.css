@@ -10,8 +10,14 @@ html, body {
 
 /*Links format*/
 a, a:active, a:visited {
-    color: white;
+    color: rgb(255, 255, 255);
     text-decoration: none;
+
+    transition: color 0.7s;
+}
+
+a:hover {
+    color: rgb(150, 150, 150);
 }
 
 /*Unorganised lists format*/
@@ -23,11 +29,13 @@ ul li {
 textarea {
     outline: none;
     resize: none;
-    border: none;
-    overflow: no-display;
+    overflow: hidden;
 
     background: rgba(0, 0, 0, 0);
+    border-color: rgba(0, 0, 0, 0);
     color: white;
+    font-family: "SF UI Display";
+    font-size: 16px;
 
     width: 100%;
 }
@@ -74,6 +82,7 @@ audio player and settings button*/
     align-self: center;
 
     width: 100%;
+    height: 100%;
 }
 
 .user_page_content_grid {
@@ -172,14 +181,21 @@ and edit/subscribe/add friend buttons*/
 /*Note list cell, containing list of notes*/
 .grid_cell_note_list {
     width: 100%;
-    height: 100%;
+
     background: rgb(50, 50, 50);
+
     border-radius: 10px;
+
     padding: 10px 10px 10px 10px;
+
     grid-column-start: 1;
     grid-column-end: 3;
     grid-row-start: 3;
     grid-row-end: 3;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 15px;
 }
 
 .feed_content_grid {
@@ -292,14 +308,200 @@ and edit/subscribe/add friend buttons*/
 
     margin: 5% 34% 5% 34%;
     width: 32%;
-    height: 100%;
+    height: auto;
     padding: 0 0;
     min-width: 120px;
     min-height: 390px;
 
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    grid-gap: 35px 35px;
+    grid-template-rows: 40px auto auto;
+    grid-gap: 15px 35px;
 }
 
+.chat_content_grid_cell_companion_data {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
 
+    width: 100%;
+
+    background: rgb(50, 50, 50);
+
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start: 1;
+    grid-row-end: 1;
+}
+
+.chat_content_grid_cell_messages {
+    width: 100%;
+
+    background: rgb(50, 50, 50);
+
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start: 2;
+    grid-row-end: 2;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 15px;
+}
+
+.chat_content_grid_cell_write_message {
+    width: 100%;
+
+    background: rgb(50, 50, 50);
+
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start: 3;
+    grid-row-end: 3;
+}
+
+#id_images, #id_videos, #id_audios, #id_files, .send_message_button, #note_id {
+    display: none;
+}
+
+#attach {
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+}
+
+.attach_menu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 0 0;
+
+    background: rgb(50, 50, 50);
+    border-radius: 10px;
+
+    visibility: hidden;
+    transform: translate(0, -100%);
+    transition: 0.3s;
+}
+
+.chat_content_grid_cell_write_message_inner_grid {
+    display: flex;
+
+    color: white;
+
+    width: 100%;
+    height: auto;
+    padding: 0 0;
+
+    flex-direction: row;
+    column-gap: 10px;
+    justify-content: space-between;
+}
+
+.send_message_icon {
+    cursor: pointer;
+}
+
+.chat_current_user_message {
+    height: auto;
+
+    background: rgb(70, 70, 70);
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+
+    font-size: 14px;
+}
+
+.message_info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.message_sender_full_name {
+    font-weight: bold;
+}
+
+.message_time {
+    font-size: 10px;
+}
+
+.message_edit {
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+}
+
+.message_edit_menu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 0 0;
+
+    background: rgb(50, 50, 50);
+    border-radius: 10px;
+
+    visibility: hidden;
+    transform: translate(0, -100%);
+    transition: 0.3s;
+}
+
+.user_note {
+    height: auto;
+
+    background: rgb(70, 70, 70);
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+
+    font-size: 14px;
+}
+
+.note_info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.note_poster_full_name {
+    font-weight: bold;
+}
+
+.note_time {
+    font-size: 10px;
+}
+
+.note_edit {
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+}
+
+.note_edit_menu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 0 0;
+
+    background: rgb(50, 50, 50);
+    border-radius: 10px;
+
+    visibility: hidden;
+    transform: translate(0, -100%);
+    transition: 0.3s;
+}
+
+.note_statistics {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}

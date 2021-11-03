@@ -1,4 +1,7 @@
+import datetime
+
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import model_to_dict
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, FormView
 from .forms import SendMessageForm
@@ -24,6 +27,10 @@ class ChatMixin(LoginRequiredMixin, DetailView, FormView):
         )
 
     def form_valid(self, form):
+        form.cleaned_data['message_id'] = \
+            f'{self.get_object().chat_id}_' \
+            f'{self.request.user.user_id}_' \
+            f'{datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}'
         form.save(user=self.request.user, chat=self.get_object())
         return super(ChatMixin, self).form_valid(form)
 

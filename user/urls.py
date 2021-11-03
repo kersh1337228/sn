@@ -3,14 +3,29 @@ from user.views import UserPageView, UserAuthenticationView, \
     UserRegisterView, UserSettingsView, UserPasswordChangeView, \
     UserMainDataEditView, UserBasicPersonalDataEditView, \
     UserContactDataEditView, UserInterestsEditView, \
-    UserEducationAndSpecializationEditView, UserDataVisibilityEditView
-
+    UserEducationAndSpecializationEditView, UserDataVisibilityEditView, \
+    UserPageEditNoteView, user_page_delete_note_view, like_view
 
 urlpatterns = [
     path(
         'user/<slug:user_id>/',
         UserPageView.as_view(),
         name='user_page'
+    ),
+    path(
+        'like/user/<slug:user_id>/<slug:note_id>/<slug:action>/',
+        like_view,
+        name='like_note',
+    ),
+    path(
+        'edit/user/<slug:user_id>/<slug:note_id>/',
+        UserPageEditNoteView.as_view(),
+        name='user_page_edit_note'
+    ),
+    path(
+        'delete/user/<slug:user_id>/<slug:note_id>/',
+        user_page_delete_note_view,
+        name='user_page_delete_note'
     ),
     path(
         'signin/',

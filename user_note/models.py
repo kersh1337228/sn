@@ -1,28 +1,55 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from .utils import PostMixin
 
+from user_community.models import Community
 
 User = get_user_model()
 
 
 '''
-Note left by user or community,
-contains content, publish information and
-statistics.
+Mixin for use with objects,
+that can be posted by user or community.
 '''
-class Note(PostMixin, models.Model):
+class PostMixin(models.Model):
+    '''Content'''
+    text = models.TextField(
+        blank=True,
+        verbose_name='Text'
+    )
+    publish_time = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Published'
+    )
+    update_time = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Last updated'
+    )
+    # User, who has published the note.
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True
+    )
+    # Community which has published the note.
+    community = models.ForeignKey(
+        Community,
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True
+    )
+
     '''Statistics'''
-    comments_amount = models.PositiveIntegerField(
-        verbose_name='Comments',
-        blank=True,
-        default=0
+    likes = models.ManyToManyField(
+        'Like',
+        related_name='note_likes'
     )
-    reposts_amount = models.PositiveIntegerField(
-        verbose_name='Reposts',
-        blank=True,
-        default=0
+    liked_by = models.ManyToManyField(
+        User,
+        related_name='note_liked_by'
     )
+
+    '''Media'''
     images = models.ManyToManyField(
         'user_media.Image',
         related_name='note_images',
@@ -40,39 +67,76 @@ class Note(PostMixin, models.Model):
         related_name='note_files',
     )
 
+    def __str__(self):
+        return self.text[:50]
+
 
 '''
-User or community comment 
-or a reply to an other comment.
+Note left by user or community,
+contains content, publish information and
+statistics.
 '''
-class Comment(PostMixin, models.Model):
-    '''Is a reply to another commentary or not'''
-    replies_to = models.ForeignKey(
+class Note(PostMixin):
+    comments = models.ManyToManyField(
         'Comment',
-        on_delete=models.DO_NOTHING,
-        null=True,
-        blank=True
-    )
-    '''Media'''
-    images = models.ManyToManyField(
-        'user_media.Image',
-        related_name='comment_images',
-    )
-    videos = models.ManyToManyField(
-        'user_media.Video',
-        related_name='comment_videos',
-    )
-    audios = models.ManyToManyField(
-        'user_media.Audio',
-        related_name='comment_audios',
-    )
-    files = models.ManyToManyField(
-        'user_media.File',
-        related_name='comment_files',
+        related_name='note_comments'
     )
     '''Statistics'''
-    replies_amount = models.PositiveIntegerField()
+    reposts_amount = models.PositiveIntegerField(
+        verbose_name='Reposts',
+        blank=True,
+        default=0
+    )
+    '''id'''
+    note_id = models.SlugField(
+        verbose_name='Note ID',
+        max_length=255,
+        null=False,
+        blank=True,
+        unique=True,
+    )
 
+
+'''User or community comment'''
+class Comment(PostMixin):
+    replies = models.ManyToManyField(
+        'Reply',
+        related_name='comment_replies'
+    )
+    note_commented = models.ForeignKey(
+        Note,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='commented_note'
+    )
+    '''id'''
+    comment_id = models.SlugField(
+        verbose_name='Comment ID',
+        max_length=255,
+        null=False,
+        blank=True,
+        unique=True,
+    )
+
+
+'''Reply to another comment.'''
+class Reply(Comment):
+    replies_to = models.ForeignKey(
+        'Comment',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='reply_source'
+    )
+    '''id'''
+    reply_id = models.SlugField(
+        verbose_name='Reply ID',
+        max_length=255,
+        null=False,
+        blank=True,
+        unique=True,
+    )
 
 '''
 Repost to user or community 
@@ -81,7 +145,7 @@ page made by the last one listed.
 class Repost(models.Model):
     user = models.ForeignKey(
         User,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
         null=True,
         blank=True
     )
@@ -91,7 +155,21 @@ class Repost(models.Model):
 class Like(models.Model):
     user = models.ForeignKey(
         User,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
+        null=False,
+        blank=True,
+    )
+    note = models.ForeignKey(
+        Note,
+        on_delete=models.CASCADE,
         null=True,
-        blank=True
+        blank=True,
+        related_name='like_to_note'
+    )
+    comment = models.ForeignKey(
+        Comment,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='like_to_comment'
     )
