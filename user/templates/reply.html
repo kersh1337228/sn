@@ -1,0 +1,55 @@
+{% load static %}
+{% load user_tags %}
+
+<div class="user_reply">
+    <div class="note_info">
+        <div class="note_poster_full_name">
+            {% if reply.user %}
+                <a href="{% url 'user_page' user_id=comment.user.user_id %}">
+                    {{ reply.user.first_name }} {{ reply.user.last_name }}
+                </a>
+            {% else %}
+                <a href="{% url 'community_page' community_id=comment.community.community_id %}">
+                    {{ reply.community.name }}
+                </a>
+            {% endif %}
+        </div>
+        <div>
+            <div class="note_edit">
+                ...
+                <ul class="note_edit_menu">
+                    <li class="note_edit_menu_edit">
+                        <a href="{% url 'user_page_edit_reply' user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id reply_id=reply.reply_id %}">
+                            Edit
+                        </a>
+                    </li>
+                    <li class="note_edit_menu_delete">
+                        <a href="{% url 'user_page_delete_reply' user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id reply_id=reply.reply_id %}">
+                            Delete
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <br><div>{{ reply.text }}</div><br>
+    <div class="note_time">{{ reply.publish_time|date:'d-m-Y H:i:s' }}</div>
+    {% if reply.update_time != reply.publish_time %}
+        <div class="note_time">Last edited: {{ reply.update_time|date:'d-m-Y H:i:s' }}</div>
+    {% endif %}
+    <br><div class="note_statistics">
+        <div>
+            {% if not user in reply.liked_by.all %}
+                <a href="{% url 'like_reply' user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id reply_id=reply.reply_id action='like' %}">
+                    <img src="{% static 'icons/inactive_like_icon.png' %}" alt="" width="10px" height="10px">
+                </a>
+                {{ reply.likes.all|length }}
+            {% else %}
+                <a href="{% url 'like_reply' user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id reply_id=reply.reply_id action='dislike' %}">
+                    <img src="{% static 'icons/active_like_icon.png' %}" alt="" width="10px" height="10px">
+                </a>
+                {{ reply.likes.all|length }}
+            {% endif %}
+        </div>
+    </div>
+</div>

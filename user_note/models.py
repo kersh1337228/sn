@@ -121,13 +121,13 @@ class Comment(PostMixin):
 
 
 '''Reply to another comment.'''
-class Reply(Comment):
-    replies_to = models.ForeignKey(
+class Reply(PostMixin):
+    comment_replied = models.ForeignKey(
         'Comment',
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name='reply_source'
+        related_name='comment_replied'
     )
     '''id'''
     reply_id = models.SlugField(
@@ -172,4 +172,11 @@ class Like(models.Model):
         null=True,
         blank=True,
         related_name='like_to_comment'
+    )
+    reply = models.ForeignKey(
+        Reply,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='like_to_reply'
     )

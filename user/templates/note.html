@@ -35,7 +35,7 @@
     <br><div>{{ note.text }}</div><br>
     <div class="note_time">{{ note.publish_time|date:'d-m-Y H:i:s' }}</div>
     {% if note.update_time != note.publish_time %}
-        <div class="note_time">Edited: {{ note.update_time|date:'d-m-Y H:i:s' }}</div>
+        <div class="note_time">Last edited: {{ note.update_time|date:'d-m-Y H:i:s' }}</div>
     {% endif %}
     <br><div class="note_statistics">
         <div>
@@ -52,18 +52,24 @@
             {% endif %}
         </div>
         <div>
-            Comments: {{ note.comments.all|length }}
+            <img src="{% static 'icons/comment_icon.png' %}" alt="" width="15px" height="15px" class="comment_icon">
+            {{ note.comments.all|length }}
         </div>
         <div>
             Reposts: {{ note.reposts_amount }}
         </div>
     </div>
     <br><div class="note_comments">
-        {% for comment in note.comments.all %}
-            {{ comment.text }}
-        {% endfor %}
+        {% if note.comments.all %}
+            {% for comment in note.comments.all %}
+                {% comment_tag user=user comment=comment note=note reply_add_form=comment_add_form %}
+            {% endfor %}
+        {% else %}
+            No comments yet
+        {% endif %}
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
+            <br>
             <div class="form_error">{{ comment_add_form.non_field_errors }}</div>
             <div class="chat_content_grid_cell_write_message_inner_grid">
                 {% attach_content_tag %}
@@ -73,7 +79,7 @@
                 {% endfor %}
                 <input type="text" name="{{ note.note_id }}" id="note_id">
                 <button type="submit" class="send_message_button" name="comment_btn"></button>
-                <div class="send_message_icon">Send</div>
+                <div class="send_message_icon">Leave</div>
             </div>
         </form>
     </div>

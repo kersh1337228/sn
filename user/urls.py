@@ -4,19 +4,44 @@ from user.views import UserPageView, UserAuthenticationView, \
     UserMainDataEditView, UserBasicPersonalDataEditView, \
     UserContactDataEditView, UserInterestsEditView, \
     UserEducationAndSpecializationEditView, UserDataVisibilityEditView, \
-    UserPageEditNoteView, user_page_delete_note_view, like_view
+    UserPageEditNoteView, user_page_delete_note_view, UserPageEditCommentView, user_page_delete_comment_view, \
+    note_like_view, comment_like_view, UserProfilePictureEditView, UserPageEditReplyView, user_page_delete_reply_view, \
+    reply_like_view
+
 
 urlpatterns = [
+    # User page
     path(
         'user/<slug:user_id>/',
         UserPageView.as_view(),
         name='user_page'
     ),
+
+    # Like
+    # Notes
     path(
         'like/user/<slug:user_id>/<slug:note_id>/<slug:action>/',
-        like_view,
+        note_like_view,
         name='like_note',
     ),
+
+    # Comments
+    path(
+        'like/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:action>/',
+        comment_like_view,
+        name='like_comment',
+    ),
+
+    # Replies
+    path(
+        'like/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:reply_id>/<slug:action>/',
+        reply_like_view,
+        name='like_reply',
+    ),
+
+
+    # Edit and delete
+    # Notes
     path(
         'edit/user/<slug:user_id>/<slug:note_id>/',
         UserPageEditNoteView.as_view(),
@@ -27,6 +52,33 @@ urlpatterns = [
         user_page_delete_note_view,
         name='user_page_delete_note'
     ),
+
+    # Comments
+    path(
+        'edit/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/',
+        UserPageEditCommentView.as_view(),
+        name='user_page_edit_comment',
+    ),
+    path(
+        'delete/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/',
+        user_page_delete_comment_view,
+        name='user_page_delete_comment',
+    ),
+
+    # Replies
+    path(
+        'edit/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:reply_id>/',
+        UserPageEditReplyView.as_view(),
+        name='user_page_edit_reply',
+    ),
+    path(
+        'delete/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:reply_id>/',
+        user_page_delete_reply_view,
+        name='user_page_delete_reply',
+    ),
+
+
+    # Authentication urls
     path(
         'signin/',
         UserAuthenticationView.as_view(),
@@ -37,7 +89,14 @@ urlpatterns = [
         UserRegisterView.as_view(),
         name='sign_up'
     ),
+
+
     # Settings urls
+    path(
+        'settings/profile_picture/',
+        UserProfilePictureEditView.as_view(),
+        name='change_user_profile_picture'
+    ),
     path(
         'settings/',
         UserSettingsView.as_view(),

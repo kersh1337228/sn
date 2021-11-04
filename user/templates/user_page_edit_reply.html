@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="user_page_content_grid">
+        {% profile_actions_tag user=user authorised_user_state=authorised_user_state %}
+        <div class="grid_cell_personal_data">
+            {{ user.first_name }} {{ user.last_name }}
+        </div>
+        <div class="grid_cell_note_list">
+            {% if notes %}
+                {% for note in notes %}
+                    {% if note.note_id == current_note_id %}
+                        <div class="user_note">
+                            <div class="note_info">
+                                <div class="note_poster_full_name">
+                                    {% if note.user %}
+                                        {{ note.user.first_name }} {{ note.user.last_name }}
+                                    {% else %}
+                                        {{ note.community.name }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <br><div>{{ note.text }}</div><br>
+                            <div class="note_time">{{ note.publish_time|date:'d-m-Y H:i:s' }}</div>
+                            {% if note.update_time != note.publish_time %}
+                                <div class="note_time">Edited: {{ note.update_time|date:'d-m-Y H:i:s' }}</div>
+                            {% endif %}
+                            <br><div class="note_statistics">
+                                <div>
+                                    {% if not user in note.liked_by.all %}
+                                        <img src="{% static 'icons/inactive_like_icon.png' %}" alt="" width="15px" height="15px">
+                                        {{ note.likes.all|length }}
+                                    {% else %}
+                                        <img src="{% static 'icons/active_like_icon.png' %}" alt="" width="15px" height="15px">
+                                        {{ note.likes.all|length }}
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <img src="{% static 'icons/comment_icon.png' %}" alt="" width="15px" height="15px">
+                                    {{ note.comments.all|length }}
+                                </div>
+                                <div>
+                                    Reposts: {{ note.reposts_amount }}
+                                </div>
+                            </div>
+                            <br><div class="note_comments_displayed">
+                                {% if note.comments.all %}
+                                    {% for comment in note.comments.all %}
+                                        {% if comment.comment_id == current_comment_id %}
+                                            <div class="user_comment">
+                                                <div class="note_info">
+                                                    <div class="note_poster_full_name">
+                                                        {% if comment.user %}
+                                                                {{ comment.user.first_name }} {{ comment.user.last_name }}
+                                                        {% else %}
+                                                                {{ comment.community.name }}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <br><div>{{ comment.text }}</div><br>
+                                                <div class="note_time">{{ comment.publish_time|date:'d-m-Y H:i:s' }}</div>
+                                                {% if comment.update_time != comment.publish_time %}
+                                                    <div class="note_time">Last edited: {{ comment.update_time|date:'d-m-Y H:i:s' }}</div>
+                                                {% endif %}
+                                                <br><div class="note_statistics">
+                                                    <div>
+                                                        {% if not user in comment.liked_by.all %}
+                                                            <img src="{% static 'icons/inactive_like_icon.png' %}" alt="" width="10px" height="10px">
+                                                            {{ comment.likes.all|length }}
+                                                        {% else %}
+                                                            <img src="{% static 'icons/active_like_icon.png' %}" alt="" width="10px" height="10px">
+                                                            {{ comment.likes.all|length }}
+                                                        {% endif %}
+                                                    </div>
+                                                    <div>
+                                                        <img src="{% static 'icons/reply_icon.png' %}" alt="" width="15px" height="15px">
+                                                        {{ comment.replies.all|length }}
+                                                    </div>
+                                                </div>
+                                                <br><div class="comment_replies_displayed">
+                                                    {% if comment.replies.all %}
+                                                        {% for reply in comment.replies.all %}
+                                                            {% if reply.reply_id != current_reply_id %}
+                                                                {% reply_tag user=user note=note comment=comment reply=reply %}
+                                                            {% else %}
+                                                                <form method="post" enctype="multipart/form-data">
+                                                                    {% csrf_token %}
+                                                                    <div class="form_error">{{ form.non_field_errors }}</div>
+                                                                    <div class="chat_content_grid_cell_write_message_inner_grid">
+                                                                        {% attach_content_tag %}
+                                                                        {% for field in form %}
+                                                                            <div class="form_error">{{ field.errors }}</div>
+                                                                            {{ field }}
+                                                                        {% endfor %}
+                                                                        <input type="text" name="{{ comment.comment_id }}" id="note_id">
+                                                                        <button type="submit" class="send_message_button" name="reply_btn"></button>
+                                                                        <div class="send_message_icon">Send</div>
+                                                                    </div>
+                                                                </form>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        No replies yet
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    No comments yet
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                No posts here
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

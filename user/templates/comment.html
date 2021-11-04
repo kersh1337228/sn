@@ -1,10 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% load static %}
+{% load user_tags %}
 
-</body>
-</html>
+<div class="user_comment">
+    <div class="note_info">
+        <div class="note_poster_full_name">
+            {% if comment.user %}
+                <a href="{% url 'user_page' user_id=comment.user.user_id %}">
+                    {{ comment.user.first_name }} {{ comment.user.last_name }}
+                </a>
+            {% else %}
+                <a href="{% url 'community_page' community_id=comment.community.community_id %}">
+                    {{ comment.community.name }}
+                </a>
+            {% endif %}
+        </div>
+        <div>
+            <div class="note_edit">
+                ...
+                <ul class="note_edit_menu">
+                    <li class="note_edit_menu_edit">
+                        <a href="{% url 'user_page_edit_comment' user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id %}">
+                            Edit
+                        </a>
+                    </li>
+                    <li class="note_edit_menu_delete">
+                        <a href="{% url 'user_page_delete_comment' user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id %}">
+                            Delete
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <br><div>{{ comment.text }}</div><br>
+    <div class="note_time">{{ comment.publish_time|date:'d-m-Y H:i:s' }}</div>
+    {% if comment.update_time != comment.publish_time %}
+        <div class="note_time">Last edited: {{ comment.update_time|date:'d-m-Y H:i:s' }}</div>
+    {% endif %}
+    <br><div class="note_statistics">
+        <div>
+            {% if not user in comment.liked_by.all %}
+                <a href="{% url 'like_comment' user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id action='like' %}">
+                    <img src="{% static 'icons/inactive_like_icon.png' %}" alt="" width="10px" height="10px">
+                </a>
+                {{ comment.likes.all|length }}
+            {% else %}
+                <a href="{% url 'like_comment' user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id action='dislike' %}">
+                    <img src="{% static 'icons/active_like_icon.png' %}" alt="" width="10px" height="10px">
+                </a>
+                {{ comment.likes.all|length }}
+            {% endif %}
+        </div>
+        <div>
+            <img src="{% static 'icons/reply_icon.png' %}" alt="" width="15px" height="15px" class="reply_icon">
+            {{ comment.replies.all|length }}
+        </div>
+    </div>
+    <br><div class="comment_replies">
+        {% if comment.replies.all %}
+            {% for reply in comment.replies.all %}
+                {% reply_tag user=user note=note comment=comment reply=reply %}
+            {% endfor %}
+        {% else %}
+            No replies yet
+        {% endif %}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form_error">{{ reply_add_form.non_field_errors }}</div>
+            <div class="chat_content_grid_cell_write_message_inner_grid">
+                {% attach_content_tag %}
+                {% for field in reply_add_form %}
+                    <div class="form_error">{{ field.errors }}</div>
+                    {{ field }}
+                {% endfor %}
+                <input type="text" name="{{ comment.comment_id }}" id="note_id">
+                <button type="submit" class="send_message_button" name="reply_btn"></button>
+                <div class="send_message_icon">Send</div>
+            </div>
+        </form>
+    </div>
+</div>

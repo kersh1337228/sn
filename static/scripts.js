@@ -30,24 +30,31 @@ if($('.attach')) {
     $('.attach_menu_audio').click(()=>{$('#id_audios').click()})
     $('.attach_menu_file').click(()=>{$('#id_files').click()})
     $('.send_message_icon').click(function() {
-        try {
+        if ($(this)[0].parentElement.children.namedItem('note_btn')) {
             $(this)[0].parentElement.children.namedItem('note_btn').click()
-        } catch (err) {
+        } else if ($(this)[0].parentElement.children.namedItem('comment_btn')) {
             $(this)[0].parentElement.children.namedItem('comment_btn').click()
+        } else if ($(this)[0].parentElement.children.namedItem('reply_btn')) {
+            $(this)[0].parentElement.children.namedItem('reply_btn').click()
         }
     })
 }
 
 // textarea automatic height correction
 if ($('textarea')) {
-    $('textarea').on('paste input', function() {
+    let textarea = $('textarea')
+    let textarea_size = function() {
         if ($(this).outerHeight() > this.scrollHeight) {
-            $(this).height(1);
+            $(this).height(1)
         }
         while ($(this).outerHeight() < this.scrollHeight) {
-            $(this).height($(this).height() + 1);
+            $(this).height($(this).height() + 1)
         }
-    });
+    }
+    textarea.on('paste input', textarea_size)
+    if (textarea.text()) {
+        textarea.trigger('input')
+    }
 }
 
 if($('.message_edit')) {
@@ -89,4 +96,48 @@ if ($('.note_edit')) {
     }
     note_edit_button.click(note_edit_menu_switch)
     // attach_menu.mouseover(attach_menu_switch)
+}
+
+
+if ($('.comment_icon')) {
+    let comment_button = $('.comment_icon')
+    let comment_menu_switch = function (){
+        let comment_menu = $(this)[0].parentElement.parentElement.parentElement.lastElementChild
+        if (comment_menu.style.visibility === 'visible') {
+            comment_menu.style.display = 'none'
+            comment_menu.style.maxHeight = '0'
+            comment_menu.style.visibility = 'hidden'
+            comment_menu.style.opacity = '0'
+            // comment_menu.style.transform = 'translate(0, -105%)'
+        } else {
+            comment_menu.style.display = 'grid'
+            comment_menu.style.maxHeight = '100%'
+            comment_menu.style.visibility = 'visible'
+            comment_menu.style.opacity  = '1'
+            // comment_menu.style.transform = 'translate(0, 0%)'
+        }
+    }
+    comment_button.click(comment_menu_switch)
+}
+
+
+if ($('.reply_icon')) {
+    let reply_button = $('.reply_icon')
+    let reply_menu_switch = function (){
+        let reply_menu = $(this)[0].parentElement.parentElement.parentElement.lastElementChild
+        if (reply_menu.style.visibility === 'visible') {
+            reply_menu.style.display = 'none'
+            reply_menu.style.maxHeight = '0'
+            reply_menu.style.visibility = 'hidden'
+            reply_menu.style.opacity = '0'
+            // comment_menu.style.transform = 'translate(0, -105%)'
+        } else {
+            reply_menu.style.display = 'grid'
+            reply_menu.style.maxHeight = '100%'
+            reply_menu.style.visibility = 'visible'
+            reply_menu.style.opacity  = '1'
+            // comment_menu.style.transform = 'translate(0, 0%)'
+        }
+    }
+    reply_button.click(reply_menu_switch)
 }

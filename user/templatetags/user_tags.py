@@ -27,9 +27,20 @@ def note_tag(user, note, comment_add_form):
 
 
 @register.inclusion_tag('comment.html')
-def note_tag(user, note, comment_add_form):
+def comment_tag(user, comment, note, reply_add_form):
+    return {
+        'user': user,
+        'comment': comment,
+        'note': note,
+        'reply_add_form': reply_add_form,
+    }
+
+
+@register.inclusion_tag('reply.html')
+def reply_tag(user, note, comment, reply):
     return {
         'user': user,
         'note': note,
-        'comment_add_form': comment_add_form,
+        'comment': comment,
+        'reply': reply,
     }

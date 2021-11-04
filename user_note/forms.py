@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from user_note.models import Note, Comment, PostMixin
+from user_note.models import Note, Comment, PostMixin, Reply
 from multiupload import fields
 from user_note.utils import note_attach_media
 
@@ -20,7 +20,7 @@ class PostFormMixin(forms.ModelForm):
         widgets = {
             'text': forms.Textarea(attrs={
                 'cols': 60,
-                'rows': 3,
+                'rows': 1,
                 'class': 'form-input',
                 'placeholder': 'Text here',
             })
@@ -42,7 +42,6 @@ class NoteAddForm(PostFormMixin):
     '''
     def __init__(self, *args, **kwargs):
         try:
-            print("some")
             super(NoteAddForm, self).__init__(*args, **kwargs)
         except TypeError:
             super(NoteAddForm, self).__init__()
@@ -83,7 +82,10 @@ class NoteAddForm(PostFormMixin):
 '''Form to add comments under content'''
 class CommentAddForm(PostFormMixin):
     def __init__(self, *args, **kwargs):
-        super(CommentAddForm, self).__init__()
+        try:
+            super(CommentAddForm, self).__init__(*args, **kwargs)
+        except TypeError:
+            super(CommentAddForm, self).__init__()
         self.cleaned_data = {}
         self.text = self.cleaned_data['text'] = kwargs.get('text')
         self.images = self.cleaned_data['images'] = kwargs.get('images')
@@ -107,11 +109,51 @@ class CommentAddForm(PostFormMixin):
             comment = note_attach_media(files, 'file', 'user', user, comment)
         else:
             self.cleaned_data['community'] = community
-            comment = Note(**self.cleaned_data)
+            comment = Comment(**self.cleaned_data)
             comment = note_attach_media(images, 'image', 'community', community, comment)
             comment = note_attach_media(videos, 'video', 'community', community, comment)
             comment = note_attach_media(audios, 'audio', 'community', community, comment)
             comment = note_attach_media(files, 'file', 'community', community, comment)
         comment.save()
         note.comments.add(comment)
-        return note
+        return comment
+
+
+'''Form to reply to other comments'''
+class ReplyAddForm(PostFormMixin):
+    def __init__(self, *args, **kwargs):
+        try:
+            super(ReplyAddForm, self).__init__(*args, **kwargs)
+        except TypeError:
+            super(ReplyAddForm, self).__init__()
+        self.cleaned_data = {}
+        self.text = self.cleaned_data['text'] = kwargs.get('text')
+        self.images = self.cleaned_data['images'] = kwargs.get('images')
+        self.videos = self.cleaned_data['videos'] = kwargs.get('videos')
+        self.audios = self.cleaned_data['audios'] = kwargs.get('audios')
+        self.files = self.cleaned_data['files'] = kwargs.get('files')
+        self.cleaned_data['reply_id'] = kwargs.get('reply_id')
+
+    def save(self, commit=True, user=None, community=None, comment=None):
+        images = self.cleaned_data.pop('images')
+        videos = self.cleaned_data.pop('videos')
+        audios = self.cleaned_data.pop('audios')
+        files = self.cleaned_data.pop('files')
+        self.cleaned_data['comment_replied'] = comment
+        if user:
+            self.cleaned_data['user'] = user
+            reply = Reply(**self.cleaned_data)
+            reply = note_attach_media(images, 'image', 'user', user, reply)
+            reply = note_attach_media(videos, 'video', 'user', user, reply)
+            reply = note_attach_media(audios, 'audio', 'user', user, reply)
+            reply = note_attach_media(files, 'file', 'user', user, reply)
+        else:
+            self.cleaned_data['community'] = community
+            reply = Reply(**self.cleaned_data)
+            reply = note_attach_media(images, 'image', 'community', community, reply)
+            reply = note_attach_media(videos, 'video', 'community', community, reply)
+            reply = note_attach_media(audios, 'audio', 'community', community, reply)
+            reply = note_attach_media(files, 'file', 'community', community, reply)
+        reply.save()
+        comment.replies.add(reply)
+        return reply

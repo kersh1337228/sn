@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="user_page_content_grid">
+        {% profile_actions_tag user=user authorised_user_state=authorised_user_state %}
+        <div class="grid_cell_personal_data">
+            {{ user.first_name }} {{ user.last_name }}
+        </div>
+        <div class="grid_cell_note_list">
+            {% if notes %}
+                {% for note in notes %}
+                    {% if note.note_id == current_note_id %}
+                        <div class="user_note">
+                            <div class="note_info">
+                                <div class="note_poster_full_name">
+                                    {% if note.user %}
+                                        {{ note.user.first_name }} {{ note.user.last_name }}
+                                    {% else %}
+                                        {{ note.community.name }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <br><div>{{ note.text }}</div><br>
+                            <div class="note_time">{{ note.publish_time|date:'d-m-Y H:i:s' }}</div>
+                            {% if note.update_time != note.publish_time %}
+                                <div class="note_time">Edited: {{ note.update_time|date:'d-m-Y H:i:s' }}</div>
+                            {% endif %}
+                            <br><div class="note_statistics">
+                                <div>
+                                    {% if not user in note.liked_by.all %}
+                                        <img src="{% static 'icons/inactive_like_icon.png' %}" alt="" width="15px" height="15px">
+                                        {{ note.likes.all|length }}
+                                    {% else %}
+                                        <img src="{% static 'icons/active_like_icon.png' %}" alt="" width="15px" height="15px">
+                                        {{ note.likes.all|length }}
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <img src="{% static 'icons/comment_icon.png' %}" alt="" width="15px" height="15px">
+                                    {{ note.comments.all|length }}
+                                </div>
+                                <div>
+                                    Reposts: {{ note.reposts_amount }}
+                                </div>
+                            </div>
+                            <br><div class="note_comments_displayed">
+                                {% if note.comments.all %}
+                                    {% for comment in note.comments.all %}
+                                        {% if comment.comment_id != current_comment_id %}
+                                            {% comment_tag user=user comment=comment note=note reply_add_form=comment_add_form %}
+                                        {% else %}
+                                            <div class="user_comment">
+                                                <form method="post" enctype="multipart/form-data">
+                                                    {% csrf_token %}
+                                                    <br>
+                                                    <div class="form_error">{{ form.non_field_errors }}</div>
+                                                    <div class="chat_content_grid_cell_write_message_inner_grid">
+                                                        {% attach_content_tag %}
+                                                        {% for field in form %}
+                                                            <div class="form_error">{{ field.errors }}</div>
+                                                            {{ field }}
+                                                        {% endfor %}
+                                                        <input type="text" name="{{ note.note_id }}" id="note_id">
+                                                        <button type="submit" class="send_message_button" name="comment_btn"></button>
+                                                        <div class="send_message_icon">Leave</div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    No comments yet
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                No posts here
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,8 +1,14 @@
+{% load static %}
+
 <div class="grid_cell_profile_actions">
     <div class="grid_cell_profile_actions_profile_picture">
-        {% if user.profile_picture %}
-            <img src="{{ user.profile_picture.url }}" alt="">
-        {% endif %}
+        <a href="{% url 'change_user_profile_picture' %}">
+            {% if user.profile_picture %}
+                <img src="{{ user.profile_picture.url }}" alt="">
+            {% else %}
+                <img src="{% static 'icons/user_icon.png' %}" alt="">
+            {% endif %}
+        </a>
     </div>
     {% if authorised_user_state == 'authorized_user_page' %}
         <a href="{% url 'user_settings' %}">
