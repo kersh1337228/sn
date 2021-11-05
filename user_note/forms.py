@@ -37,6 +37,10 @@ class PostAddForm(forms.ModelForm):
             'audios': self.cleaned_data.pop('audios'),
             'files': self.cleaned_data.pop('files'),
         }
+        if kwargs.get('type') == 'comment':
+            self.cleaned_data['note_commented'] = kwargs.get('parent')
+        elif kwargs.get('type') == 'reply':
+            self.cleaned_data['comment_replied'] = kwargs.get('parent')
         self.cleaned_data[kwargs.get("owner_type")] = kwargs.get('owner')
         object = kwargs.get('object_model')(**self.cleaned_data)
         object = attach_media(media, kwargs.get('owner_type'), kwargs.get('owner'), object)

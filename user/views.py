@@ -14,6 +14,7 @@ from user.forms import UserRegisterForm, UserAuthenticationForm, UserMainDataEdi
 from user.utils import UserViewMixin, get_user_state, UserEditMixin
 from user_note.forms import PostAddForm
 from user_note.models import Note, Like, Comment, Reply
+from django.http import HttpResponseRedirect
 
 
 User = get_user_model()
@@ -110,17 +111,6 @@ class UserPageView(UserPageMixin):
 
 
 class UserPageEditPostView(UserPageView):
-    def __init__(self):
-        if self.kwargs.get('reply_id'):
-            self.type = 'reply'
-            self.model = Reply
-        elif self.kwargs.get('comment_id'):
-            self.type = 'comment'
-            self.model = Comment
-        elif self.kwargs.get('note_id'):
-            self.type = 'note'
-            self.model = Note
-
     def get_template_names(self):
         if self.kwargs.get('reply_id'):
             return 'user_page_edit_reply.html'
@@ -140,6 +130,15 @@ class UserPageEditPostView(UserPageView):
         return context
 
     def get_initial(self):
+        if self.kwargs.get('reply_id'):
+            self.type = 'reply'
+            self.type_model = Reply
+        elif self.kwargs.get('comment_id'):
+            self.type = 'comment'
+            self.type_model = Comment
+        elif self.kwargs.get('note_id'):
+            self.type = 'note'
+            self.type_model = Note
         initial = super().get_initial()
         initial.update(
             **model_to_dict(
@@ -157,6 +156,7 @@ class UserPageEditPostView(UserPageView):
             text=form.cleaned_data.get('text'),
             update_time=datetime.datetime.now()
         )
+        return HttpResponseRedirect(self.get_success_url())
 
 
 @login_required

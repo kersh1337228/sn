@@ -133,7 +133,7 @@ class Comment(PostMixin):
     def save(self, *args, **kwargs):
         if not self.comment_id:
             now = datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
-            self.note_id = f'{self.note_commented.note_id}_comment_{now}'
+            self.comment_id = f'{self.note_commented.note_id}_comment_{now}'
         super(Comment, self).save(*args, **kwargs)
 
 
@@ -158,7 +158,7 @@ class Reply(PostMixin):
     def save(self, *args, **kwargs):
         if not self.reply_id:
             now = datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
-            self.note_id = f'{self.comment_replied.comment_id}_reply_{now}'
+            self.reply_id = f'{self.comment_replied.comment_id}_reply_{now}'
         super(Reply, self).save(*args, **kwargs)
 
 '''
