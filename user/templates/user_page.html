@@ -13,7 +13,7 @@
         <div class="grid_cell_add_note">
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="form_error">{{ note_add_form.non_field_errors }}</div>
+                <div class="form_error">{{ form.non_field_errors }}</div>
                 <div class="chat_content_grid_cell_write_message_inner_grid">
                     {% attach_content_tag %}
                     {% for field in form %}
@@ -28,7 +28,7 @@
         <div class="grid_cell_note_list">
             {% if notes %}
                 {% for note in notes %}
-                    {% note_tag user=user note=note comment_add_form=form %}
+                    {% post_tag type='note' post=note user=user note=note form=form %}
                 {% endfor %}
             {% else %}
                 No posts here

@@ -1,11 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, FormView
 from user_community.models import Community
 from user_note.forms import PostAddForm
-from user_note.models import Note
-
+from user_note.models import Note, Comment, Reply
 
 User = get_user_model()
 
@@ -36,7 +36,32 @@ class NoteListView(ListView, FormView):
         return context
 
     def form_valid(self, form):
-        form.save(user=self.request.user)
+        if 'note_btn' in self.request.POST:
+            form.save(
+                owner=self.request.user,
+                owner_type='user',
+                object_model=Note,
+                type='note',
+                parent=self.request.user
+            )
+        elif 'comment_btn' in self.request.POST:
+            note_id = [key for key in self.request.POST if '_note_' in key][0]
+            form.save(
+                owner=self.request.user,
+                owner_type='user',
+                object_model=Comment,
+                type='comment',
+                parent=get_object_or_404(Note, note_id=note_id)
+            )
+        elif 'reply_btn' in self.request.POST:
+            comment_id = [key for key in self.request.POST if '_comment_' in key][0]
+            form.save(
+                owner=self.request.user,
+                owner_type='user',
+                object_model=Reply,
+                type='reply',
+                parent=get_object_or_404(Comment, comment_id=comment_id)
+            )
         return super(NoteListView, self).form_valid(form)
 
 

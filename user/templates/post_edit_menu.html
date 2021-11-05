@@ -1,0 +1,26 @@
+<div class="note_edit">...
+    <ul class="note_edit_menu">
+        <li class="note_edit_menu_edit">
+            <a href="{% if type == 'note' %}
+                {% url 'user_page_edit_note' user_id=user_id note_id=note_id %}
+            {% elif type == 'comment' %}
+                {% url 'user_page_edit_comment' user_id=user_id note_id=note_id comment_id=comment_id %}
+            {% elif type == 'reply' %}
+                {% url 'user_page_edit_reply' user_id=user_id note_id=note_id comment_id=comment_id reply_id=reply_id %}
+            {% endif %}">
+                Edit
+            </a>
+        </li>
+        <li class="note_edit_menu_delete">
+            <a href="{% if type == 'note' %}
+                {% url 'user_page_delete_note' user_id=user_id note_id=note_id %}
+            {% elif type == 'comment' %}
+                {% url 'user_page_delete_comment' user_id=user_id note_id=note_id comment_id=comment_id %}
+            {% elif type == 'reply' %}
+                {% url 'user_page_delete_reply' user_id=user_id note_id=note_id comment_id=comment_id reply_id=reply_id %}
+            {% endif %}">
+                Delete
+            </a>
+        </li>
+    </ul>
+</div>

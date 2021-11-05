@@ -15,21 +15,7 @@
             {% endif %}
         </div>
         <div>
-            <div class="note_edit">
-                ...
-                <ul class="note_edit_menu">
-                    <li class="note_edit_menu_edit">
-                        <a href="{% url 'user_page_edit_note' user_id=user.user_id note_id=note.note_id %}">
-                            Edit
-                        </a>
-                    </li>
-                    <li class="note_edit_menu_delete">
-                        <a href="{% url 'user_page_delete_note' user_id=user.user_id note_id=note.note_id %}">
-                            Delete
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            {% post_edit_menu_tag type='note' user_id=user.user_id note_id=note.note_id %}
         </div>
     </div>
     <br><div>{{ note.text }}</div><br>

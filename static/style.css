@@ -93,7 +93,7 @@ audio player and settings button*/
 
     color: white;
 
-    margin: 4% 34% 6% 34%;
+    margin: 5% 34% 5% 34%;
     width: 32%;
     height: auto;
     padding: 0 0 0 0;
@@ -101,7 +101,6 @@ audio player and settings button*/
     min-height: 390px;
 
     grid-template-columns: 1fr 2fr;
-    grid-template-rows: auto auto auto;
     grid-auto-rows: minmax(min-content, max-content);
     grid-gap: 20px 20px;
 }
@@ -212,22 +211,21 @@ and edit/subscribe/add friend buttons*/
 
     margin: 5% 34% 5% 34%;
     width: 32%;
-    height: 100%;
-    padding: 0 0;
+    height: auto;
+    padding: 0 0 0 0;
     min-width: 120px;
     min-height: 390px;
 
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
+    grid-auto-rows: minmax(min-content, max-content);
     grid-gap: 35px 35px;
 }
 
 .feed_grid_cell_add_note {
-    width: 100%;
-    height: 100%;
     background: rgb(50, 50, 50);
     border-radius: 10px;
     padding: 20px 20px 20px 20px;
+
     grid-column-start: 1;
     grid-column-end: 1;
     grid-row-start: 1;
@@ -235,15 +233,22 @@ and edit/subscribe/add friend buttons*/
 }
 
 .feed_grid_cell_note_list {
-    width: 100%;
-    height: 100%;
+    min-width: 278px;
+
     background: rgb(50, 50, 50);
+
     border-radius: 10px;
+
     padding: 20px 20px 20px 20px;
+
     grid-column-start: 1;
     grid-column-end: 1;
     grid-row-start: 2;
     grid-row-end: 2;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 20px;
 }
 
 .user_list_content_grid {
@@ -392,6 +397,8 @@ and edit/subscribe/add friend buttons*/
 
     background: rgb(50, 50, 50);
     border-radius: 10px;
+
+    z-index: 3;
 
     visibility: hidden;
     transform: translate(0, -100%);
