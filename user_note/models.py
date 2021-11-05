@@ -1,7 +1,9 @@
+import datetime
+
 from django.contrib.auth import get_user_model
 from django.db import models
-
 from user_community.models import Community
+
 
 User = get_user_model()
 
@@ -96,6 +98,15 @@ class Note(PostMixin):
         unique=True,
     )
 
+    def save(self, *args, **kwargs):
+        if not self.note_id:
+            now = datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
+            if self.user:
+                self.note_id = f'{self.user.user_id}_note_{now}'
+            else:
+                self.note_id = f'{self.community.community_id}_note_{now}'
+        super(Note, self).save(*args, **kwargs)
+
 
 '''User or community comment'''
 class Comment(PostMixin):
@@ -119,6 +130,12 @@ class Comment(PostMixin):
         unique=True,
     )
 
+    def save(self, *args, **kwargs):
+        if not self.comment_id:
+            now = datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
+            self.note_id = f'{self.note_commented.note_id}_comment_{now}'
+        super(Comment, self).save(*args, **kwargs)
+
 
 '''Reply to another comment.'''
 class Reply(PostMixin):
@@ -138,6 +155,12 @@ class Reply(PostMixin):
         unique=True,
     )
 
+    def save(self, *args, **kwargs):
+        if not self.reply_id:
+            now = datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
+            self.note_id = f'{self.comment_replied.comment_id}_reply_{now}'
+        super(Reply, self).save(*args, **kwargs)
+
 '''
 Repost to user or community 
 page made by the last one listed.
@@ -151,7 +174,7 @@ class Repost(models.Model):
     )
 
 
-'''Like set be user or community'''
+'''Like set by user'''
 class Like(models.Model):
     user = models.ForeignKey(
         User,

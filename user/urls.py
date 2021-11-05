@@ -3,11 +3,8 @@ from user.views import UserPageView, UserAuthenticationView, \
     UserRegisterView, UserSettingsView, UserPasswordChangeView, \
     UserMainDataEditView, UserBasicPersonalDataEditView, \
     UserContactDataEditView, UserInterestsEditView, \
-    UserEducationAndSpecializationEditView, UserDataVisibilityEditView, \
-    UserPageEditNoteView, user_page_delete_note_view, UserPageEditCommentView, user_page_delete_comment_view, \
-    note_like_view, comment_like_view, UserProfilePictureEditView, UserPageEditReplyView, user_page_delete_reply_view, \
-    reply_like_view
-
+    UserEducationAndSpecializationEditView, UserDataVisibilityEditView, like_view, delete_view, UserPageEditPostView, \
+    UserProfilePictureEditView
 
 urlpatterns = [
     # User page
@@ -21,21 +18,21 @@ urlpatterns = [
     # Notes
     path(
         'like/user/<slug:user_id>/<slug:note_id>/<slug:action>/',
-        note_like_view,
+        like_view,
         name='like_note',
     ),
 
     # Comments
     path(
         'like/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:action>/',
-        comment_like_view,
+        like_view,
         name='like_comment',
     ),
 
     # Replies
     path(
         'like/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:reply_id>/<slug:action>/',
-        reply_like_view,
+        like_view,
         name='like_reply',
     ),
 
@@ -44,36 +41,36 @@ urlpatterns = [
     # Notes
     path(
         'edit/user/<slug:user_id>/<slug:note_id>/',
-        UserPageEditNoteView.as_view(),
+        UserPageEditPostView.as_view(),
         name='user_page_edit_note'
     ),
     path(
         'delete/user/<slug:user_id>/<slug:note_id>/',
-        user_page_delete_note_view,
+        delete_view,
         name='user_page_delete_note'
     ),
 
     # Comments
     path(
         'edit/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/',
-        UserPageEditCommentView.as_view(),
+        UserPageEditPostView.as_view(),
         name='user_page_edit_comment',
     ),
     path(
         'delete/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/',
-        user_page_delete_comment_view,
+        delete_view,
         name='user_page_delete_comment',
     ),
 
     # Replies
     path(
         'edit/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:reply_id>/',
-        UserPageEditReplyView.as_view(),
+        UserPageEditPostView.as_view(),
         name='user_page_edit_reply',
     ),
     path(
         'delete/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:reply_id>/',
-        user_page_delete_reply_view,
+        delete_view,
         name='user_page_delete_reply',
     ),
 

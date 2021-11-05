@@ -16,7 +16,7 @@
                 <div class="form_error">{{ note_add_form.non_field_errors }}</div>
                 <div class="chat_content_grid_cell_write_message_inner_grid">
                     {% attach_content_tag %}
-                    {% for field in note_add_form %}
+                    {% for field in form %}
                         <div class="form_error">{{ field.errors }}</div>
                         {{ field }}
                     {% endfor %}
@@ -28,7 +28,7 @@
         <div class="grid_cell_note_list">
             {% if notes %}
                 {% for note in notes %}
-                    {% note_tag user=user note=note comment_add_form=comment_add_form %}
+                    {% note_tag user=user note=note comment_add_form=form %}
                 {% endfor %}
             {% else %}
                 No posts here

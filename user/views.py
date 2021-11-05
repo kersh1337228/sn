@@ -12,11 +12,28 @@ from user.forms import UserRegisterForm, UserAuthenticationForm, UserMainDataEdi
     UserBasicPersonalDataEditForm, UserContactDataEditForm, UserInterestsEditForm, \
     UserEducationAndSpecializationEditForm, UserDataVisibilityEditForm
 from user.utils import UserViewMixin, get_user_state, UserEditMixin
-from user_note.forms import NoteAddForm, CommentAddForm, PostFormMixin, ReplyAddForm
+from user_note.forms import PostAddForm
 from user_note.models import Note, Like, Comment, Reply
 
 
 User = get_user_model()
+
+
+'''The decorator to check if current user is not active'''
+def functionally_based_view_decorator(view):
+    def actual_decorator(request, *args, **kwargs):
+        if request.user.is_active:
+            return view(request, *args, **kwargs)
+        else:
+            context = {
+                'title': 'Error',
+                'error_message': 'No such user',
+            }
+            return redirect(
+                'error.html',
+                context=context
+            )
+    return actual_decorator
 
 
 class UserPageMixin(LoginRequiredMixin, UserViewMixin, TemplateView, FormView):
@@ -55,365 +72,162 @@ check and change his/her personal data,
 add content and configure this page.
 '''
 class UserPageView(UserPageMixin):
-    form_class = PostFormMixin
+    form_class = PostAddForm
     template_name = 'user_page.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['note_add_form'] = NoteAddForm
-        context['comment_add_form'] = CommentAddForm
         return context
 
     def form_valid(self, form):
         if 'note_btn' in self.request.POST:
-            note_add_view(self.request, form)
+            form.save(
+                owner=self.request.user,
+                owner_type='user',
+                object_model=Note,
+                type='note',
+                parent=self.request.user
+            )
         elif 'comment_btn' in self.request.POST:
             note_id = [key for key in self.request.POST if '_note_' in key][0]
-            comment_add_view(self.request, form, note_id)
+            form.save(
+                owner=self.request.user,
+                owner_type='user',
+                object_model=Comment,
+                type='comment',
+                parent=get_object_or_404(Note, note_id=note_id)
+            )
         elif 'reply_btn' in self.request.POST:
             comment_id = [key for key in self.request.POST if '_comment_' in key][0]
-            reply_add_view(self.request, form, comment_id)
+            form.save(
+                owner=self.request.user,
+                owner_type='user',
+                object_model=Reply,
+                type='reply',
+                parent=get_object_or_404(Comment, comment_id=comment_id)
+            )
         return super(UserPageView, self).form_valid(form)
 
 
-@login_required
-def note_add_view(request, form):
-    user = request.user
-    if user.is_active:
-        if request.method == 'POST':
-            form.cleaned_data['note_id'] = \
-                f'{user.user_id}_note_' \
-                f'{datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
-            note_add_form = NoteAddForm(**form.cleaned_data)
-            note_add_form.save(user=user)
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect(
-            'error.html',
-            context=context
-        )
+class UserPageEditPostView(UserPageView):
+    def __init__(self):
+        if self.kwargs.get('reply_id'):
+            self.type = 'reply'
+            self.model = Reply
+        elif self.kwargs.get('comment_id'):
+            self.type = 'comment'
+            self.model = Comment
+        elif self.kwargs.get('note_id'):
+            self.type = 'note'
+            self.model = Note
 
-
-@login_required
-def comment_add_view(request, form, note_id):
-    user = request.user
-    if user.is_active:
-        note = get_object_or_404(Note, note_id=note_id)
-        if request.method == 'POST':
-            form.cleaned_data['comment_id'] = \
-                f'{note_id}_comment_' \
-                f'{datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
-            comment_add_form = CommentAddForm(**form.cleaned_data)
-            comment_add_form.save(user=user, note=note)
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect(
-            'error.html',
-            context=context
-        )
-
-
-@login_required
-def reply_add_view(request, form, comment_id):
-    user = request.user
-    if user.is_active:
-        comment = get_object_or_404(Comment, comment_id=comment_id)
-        if request.method == 'POST':
-            form.cleaned_data['reply_id'] = \
-                f'{comment_id}_reply_' \
-                f'{datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
-            reply_add_form = ReplyAddForm(**form.cleaned_data)
-            reply_add_form.save(user=user, comment=comment)
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect(
-            'error.html',
-            context=context
-        )
-
-
-'''
-UserPageEditNoteView allowing to 
-edit the note you have already posted
-'''
-class UserPageEditNoteView(UserPageMixin):
-    form_class = NoteAddForm
-    template_name = 'user_page_edit_note.html'
+    def get_template_names(self):
+        if self.kwargs.get('reply_id'):
+            return 'user_page_edit_reply.html'
+        elif self.kwargs.get('comment_id'):
+            return 'user_page_edit_comment.html'
+        elif self.kwargs.get('note_id'):
+            return 'user_page_edit_note.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['current_note_id'] = self.kwargs.get('note_id')
+        if self.kwargs.get('reply_id'):
+            context['current_reply_id'] = self.kwargs.get('reply_id')
+        if self.kwargs.get('comment_id'):
+            context['current_comment_id'] = self.kwargs.get('comment_id')
+        if self.kwargs.get('note_id'):
+            context['current_note_id'] = self.kwargs.get('note_id')
         return context
 
     def get_initial(self):
         initial = super().get_initial()
         initial.update(
             **model_to_dict(
-                Note.objects.get(
-                    note_id=self.kwargs.get('note_id')
+                self.type_model.objects.get(
+                    **{f'{self.type}_id': self.kwargs.get(f'{self.type}_id')}
                 )
             )
         )
         return initial
 
     def form_valid(self, form):
-        Note.objects.filter(
-            note_id=self.kwargs.get('note_id')
+        self.type_model.objects.filter(
+            **{f'{self.type}_id': self.kwargs.get(f'{self.type}_id')}
         ).update(
             text=form.cleaned_data.get('text'),
             update_time=datetime.datetime.now()
         )
-        return super(UserPageEditNoteView, self).form_valid(form)
-
-
-'''
-user_page_delete_note_view allowing to 
-delete the note you have already posted
-'''
-@login_required
-def user_page_delete_note_view(request, user_id, note_id):
-    user = get_object_or_404(User, user_id=user_id)
-    if user.is_active:
-        Note.objects.get(
-            note_id=note_id
-        ).delete()
-        return redirect(
-            'user_page',
-            user_id=user.user_id
-        )
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect(
-            'error.html',
-            context=context
-        )
 
 
 @login_required
-def note_like_view(request, user_id, note_id, action):
-    user = request.user
-    if user.is_active:
-        note = get_object_or_404(Note, note_id=note_id)
-        if action == 'like':
-            like = Like(
-                user=user,
-                note=note
-            )
-            like.save()
-            note.likes.add(like)
-            note.liked_by.add(user)
-        elif action == 'dislike':
-            like = get_object_or_404(
-                Like,
-                user=user,
-                note=note,
-            )
-            like.delete()
-            note.liked_by.remove(user)
-        return redirect(
-            'user_page',
-            user_id=user.user_id
-        )
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect(
-            'error.html',
-            context=context
-        )
-
-
-@login_required
-def comment_like_view(request, user_id, note_id, comment_id, action):
-    user = request.user
-    if user.is_active:
-        comment = get_object_or_404(Comment, comment_id=comment_id)
-        if action == 'like':
-            like = Like(
-                user=user,
-                comment=comment
-            )
-            like.save()
-            comment.likes.add(like)
-            comment.liked_by.add(user)
-        elif action == 'dislike':
-            like = get_object_or_404(
-                Like,
-                user=user,
-                comment=comment,
-            )
-            like.delete()
-            comment.liked_by.remove(user)
-        return redirect(
-            'user_page',
-            user_id=user.user_id
-        )
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect(
-            'error.html',
-            context=context
-        )
-
-
-class UserPageEditCommentView(UserPageMixin):
-    form_class = CommentAddForm
-    template_name = 'user_page_edit_comment.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['current_note_id'] = self.kwargs.get('note_id')
-        context['current_comment_id'] = self.kwargs.get('comment_id')
-        return context
-
-    def get_initial(self):
-        initial = super().get_initial()
-        initial.update(
-            **model_to_dict(
-                Comment.objects.get(
-                    comment_id=self.kwargs.get('comment_id')
-                )
-            )
-        )
-        return initial
-
-    def form_valid(self, form):
-        Comment.objects.filter(
-            comment_id=self.kwargs.get('comment_id')
-        ).update(
-            text=form.cleaned_data.get('text'),
-            update_time=datetime.datetime.now()
-        )
-        return super(UserPageEditCommentView, self).form_valid(form)
-
-
-@login_required
-def user_page_delete_comment_view(request, user_id, note_id, comment_id):
-    user = get_object_or_404(User, user_id=user_id)
-    if user.is_active:
-        Comment.objects.get(
-            comment_id=comment_id
-        ).delete()
-        return redirect(
-            'user_page',
-            user_id=user.user_id
-        )
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect(
-            'error.html',
-            context=context
-        )
-
-
-@login_required
-def reply_like_view(request, user_id, note_id, comment_id, reply_id, action):
-    user = request.user
-    if user.is_active:
-        reply = get_object_or_404(Reply, reply_id=reply_id)
-        if action == 'like':
-            like = Like(
-                user=user,
-                reply=reply
-            )
-            like.save()
-            reply.likes.add(like)
-            reply.liked_by.add(user)
-        elif action == 'dislike':
-            like = get_object_or_404(
-                Like,
-                user=user,
-                reply=reply,
-            )
-            like.delete()
-            reply.liked_by.remove(user)
-        return redirect(
-            'user_page',
-            user_id=user.user_id
-        )
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect(
-            'error.html',
-            context=context
-        )
-
-
-class UserPageEditReplyView(UserPageMixin):
-    form_class = ReplyAddForm
-    template_name = 'user_page_edit_reply.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['current_note_id'] = self.kwargs.get('note_id')
-        context['current_comment_id'] = self.kwargs.get('comment_id')
-        context['current_reply_id'] = self.kwargs.get('reply_id')
-        return context
-
-    def get_initial(self):
-        initial = super().get_initial()
-        initial.update(
-            **model_to_dict(
-                Reply.objects.get(
-                    reply_id=self.kwargs.get('reply_id')
-                )
-            )
-        )
-        return initial
-
-    def form_valid(self, form):
-        Reply.objects.filter(
-            reply_id=self.kwargs.get('reply_id')
-        ).update(
-            text=form.cleaned_data.get('text'),
-            update_time=datetime.datetime.now()
-        )
-        return super(UserPageEditReplyView, self).form_valid(form)
-
-
-@login_required
-def user_page_delete_reply_view(request, user_id, note_id, comment_id, reply_id):
-    user = get_object_or_404(User, user_id=user_id)
-    if user.is_active:
+@functionally_based_view_decorator
+def delete_view(request, **kwargs):
+    if kwargs.get('reply_id'):
         Reply.objects.get(
-            reply_id=reply_id
+            reply_id=kwargs.get('reply_id')
         ).delete()
-        return redirect(
-            'user_page',
-            user_id=user.user_id
+    elif kwargs.get('comment_id'):
+        Comment.objects.get(
+            comment_id=kwargs.get('comment_id')
+        ).delete()
+    elif kwargs.get('note_id'):
+        Note.objects.get(
+            note_id=kwargs.get('note_id')
+        ).delete()
+    return redirect(
+        'user_page',
+        user_id=kwargs.get('user_id')
+    )
+
+
+@login_required
+@functionally_based_view_decorator
+def like_view(request, **kwargs):
+    def like(type, object, action):
+        if action == 'like':
+            like = Like(
+                user=request.user,
+                **{type: object}
+            )
+            like.save()
+            object.likes.add(like)
+            object.liked_by.add(user)
+        elif action == 'dislike':
+            like = get_object_or_404(
+                Like,
+                user=request.user,
+                **{type: object}
+            )
+            like.delete()
+            object.liked_by.remove(request.user)
+    if kwargs.get('reply_id'):
+        like(
+            'reply',
+            get_object_or_404(
+                Reply,
+                reply_id=kwargs.get('reply_id')
+            )
         )
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect(
-            'error.html',
-            context=context
+    elif kwargs.get('comment_id'):
+        like(
+            'comment',
+            get_object_or_404(
+                Comment,
+                comment_id=kwargs.get('comment_id')
+            )
         )
+    elif kwargs.get('note_id'):
+        like(
+            'note',
+            get_object_or_404(
+                Note,
+                note_id=kwargs.get('note_id')
+            )
+        )
+    return redirect(
+        'user_page',
+        user_id=kwargs.get('user_id')
+    )
 
 
 '''

@@ -7,7 +7,7 @@ from django.views.generic import CreateView, ListView, UpdateView, DeleteView, D
 from user_community.forms import CommunityCreateForm, CommunityEditForm
 from user_community.models import Community, CommunitySubscriber, CommunitySubscribeRequest
 from user_community.utils import get_community_state
-from user_note.forms import NoteAddForm
+from user_note.forms import PostAddForm
 
 
 User = get_user_model()
@@ -19,7 +19,7 @@ class CommunityPageView(LoginRequiredMixin, DetailView, FormView):
     template_name = 'community_page.html'
     context_object_name = 'community'
     slug_url_kwarg = 'community_id'
-    form_class = NoteAddForm
+    form_class = PostAddForm
 
     def get_success_url(self):
         return reverse_lazy(

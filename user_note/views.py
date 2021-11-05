@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, FormView
 from user_community.models import Community
-from user_note.forms import NoteAddForm
+from user_note.forms import PostAddForm
 from user_note.models import Note
 
 
@@ -18,7 +18,7 @@ class NoteListView(ListView, FormView):
     model = Note
     template_name = 'feed.html'
     context_object_name = 'notes'
-    form_class = NoteAddForm
+    form_class = PostAddForm
 
     def get_success_url(self):
         return reverse_lazy('note_list')
@@ -45,7 +45,7 @@ Note adding view on
 behalf of community
 '''
 class CommunityNoteAddView(CreateView):
-    form_class = NoteAddForm
+    form_class = PostAddForm
     template_name = 'community_page.html'
     slug_url_kwarg = 'community_id'
 

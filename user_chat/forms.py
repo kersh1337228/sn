@@ -4,7 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from multiupload import fields
 from .models import Message, GroupChat
-from user_note.utils import note_attach_media
+from user_note.utils import attach_media
 
 
 def get_user_friends(instance):
