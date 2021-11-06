@@ -1,24 +1,28 @@
 {% load static %}
 
 {% if not user in post.liked_by.all %}
-    <a href="{% if type == 'note' %}
+    <a href="
+    {% if type == 'note' %}
         {% url 'like_note' user_id=user.user_id note_id=note.note_id action='like' %}
     {% elif type == 'comment' %}
         {% url 'like_comment' user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id action='like' %}
     {% elif type == 'reply' %}
         {% url 'like_reply' user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id reply_id=reply.reply_id action='like' %}
-    {% endif %}">
+    {% endif %}
+    ">
         <img src="{% static 'icons/inactive_like_icon.png' %}" alt="" width="15px" height="15px">
     </a>
     {{ post.likes.all|length }}
 {% else %}
-    <a href="{% if type == 'note' %}
+    <a href="
+    {% if type == 'note' %}
         {% url 'like_note' user_id=user.user_id note_id=note.note_id action='dislike' %}
     {% elif type == 'comment' %}
         {% url 'like_comment' user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id action='dislike' %}
     {% elif type == 'reply' %}
         {% url 'like_reply' user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id reply_id=reply.reply_id action='dislike' %}
-    {% endif %}">
+    {% endif %}
+    ">
         <img src="{% static 'icons/active_like_icon.png' %}" alt="" width="15px" height="15px">
     </a>
     {{ post.likes.all|length }}

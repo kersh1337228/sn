@@ -51,7 +51,10 @@ class UserPageMixin(LoginRequiredMixin, UserViewMixin, TemplateView, FormView):
         )
 
     def get_user_profile(self):
-        return get_object_or_404(User, user_id=self.kwargs.get('user_id'))
+        return get_object_or_404(
+            User,
+            user_id=self.kwargs.get('user_id')
+        )
 
     def get_context_data(self, **kwargs):
         user = self.get_user_profile()
@@ -59,10 +62,9 @@ class UserPageMixin(LoginRequiredMixin, UserViewMixin, TemplateView, FormView):
         context['title'] = f'{user.first_name} {user.last_name}'
         context['notes'] = user.notes.all() | user.reposts.all()
         context['user'] = user
-        context['authorised_user'] = self.request.user
         context['authorised_user_state'] = get_user_state(
             context['user'],
-            context['authorised_user'],
+            self.request.user,
         )
         return context
 
@@ -174,16 +176,17 @@ def delete_view(request, **kwargs):
         Note.objects.get(
             note_id=kwargs.get('note_id')
         ).delete()
-    return redirect(
-        'user_page',
-        user_id=kwargs.get('user_id')
-    )
+    return redirect(request.META['HTTP_REFERER'])
 
 
 @login_required
 @functionally_based_view_decorator
 def like_view(request, **kwargs):
-    def like(type, object, action):
+    def like(type, model, id, action):
+        object = get_object_or_404(
+            model,
+            **{f'{type}_id': id}
+        )
         if action == 'like':
             like = Like(
                 user=request.user,
@@ -191,7 +194,7 @@ def like_view(request, **kwargs):
             )
             like.save()
             object.likes.add(like)
-            object.liked_by.add(user)
+            object.liked_by.add(request.user)
         elif action == 'dislike':
             like = get_object_or_404(
                 Like,
@@ -203,31 +206,25 @@ def like_view(request, **kwargs):
     if kwargs.get('reply_id'):
         like(
             'reply',
-            get_object_or_404(
-                Reply,
-                reply_id=kwargs.get('reply_id')
-            )
+            Reply,
+            kwargs.get('reply_id'),
+            kwargs.get('action'),
         )
     elif kwargs.get('comment_id'):
         like(
             'comment',
-            get_object_or_404(
-                Comment,
-                comment_id=kwargs.get('comment_id')
-            )
+            Comment,
+            kwargs.get('comment_id'),
+            kwargs.get('action'),
         )
     elif kwargs.get('note_id'):
         like(
             'note',
-            get_object_or_404(
-                Note,
-                note_id=kwargs.get('note_id')
-            )
+            Note,
+            kwargs.get('note_id'),
+            kwargs.get('action'),
         )
-    return redirect(
-        'user_page',
-        user_id=kwargs.get('user_id')
-    )
+    return redirect(request.META['HTTP_REFERER'])
 
 
 '''

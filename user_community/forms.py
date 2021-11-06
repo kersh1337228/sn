@@ -18,7 +18,10 @@ class CommunityCreateForm(ModelForm):
                 attrs={'class': 'form-input'}
             ),
             'is_public': forms.Select(
-                attrs={'class': 'form-input'}
+                attrs={'class': 'form-select'}
+            ),
+            'staff_list': forms.SelectMultiple(
+                attrs={'class': 'form-select'}
             )
         }
 
@@ -26,6 +29,10 @@ class CommunityCreateForm(ModelForm):
         name = self.cleaned_data.get('name')
         validate_community_name(name)
         return name
+
+    def __init__(self, *args, **kwargs):
+        super(CommunityCreateForm, self).__init__(*args, **kwargs)
+        self.fields['staff_list'].required = False
 
 
 '''Form of editing the existing community'''

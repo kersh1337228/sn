@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load user_tags %}
+{% load community_tags %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
+    {% with request.user as user %}
     <div class="user_page_content_grid">
-        {% profile_actions_tag user=user authorised_user_state=authorised_user_state %}
+        {% community_actions_tag community=community community_state=community_state %}
         <div class="grid_cell_personal_data">
-            {{ user.first_name }} {{ user.last_name }}
+            {{ community.name }}
         </div>
         <div class="grid_cell_note_list">
             {% if notes %}
@@ -51,7 +53,7 @@
                                 {% if note.comments.all %}
                                     {% for comment in note.comments.all %}
                                         {% if comment.comment_id != current_comment_id %}
-                                            {% post_tag type='comment' post=comment user=request.user comment=comment note=note reply_add_form=comment_add_form %}
+                                            {% post_tag type='comment' post=comment user=request.user community=community comment=comment note=note reply_add_form=comment_add_form %}
                                         {% else %}
                                             <div class="user_comment">
                                                 {% form_tag form=form type='comment' note=note comment=comment %}
@@ -70,4 +72,5 @@
             {% endif %}
         </div>
     </div>
+    {% endwith %}
 {% endblock %}

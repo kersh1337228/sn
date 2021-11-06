@@ -1,20 +1,21 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load community_tags %}
 {% load user_tags %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
     <div class="user_page_content_grid">
-        {% profile_actions_tag user=user authorised_user_state=authorised_user_state %}
+        {% community_actions_tag community=community community_state=community_state %}
         <div class="grid_cell_personal_data">
-            {{ user.first_name }} {{ user.last_name }}
+            {{ community.name }}
         </div>
         <div class="grid_cell_note_list">
             {% if notes %}
                 {% for note in notes %}
                     {% if note.note_id != current_note_id %}
-                        {% post_tag type='note' post=note user=request.user note=note comment_add_form=comment_add_form %}
+                        {% post_tag type='note' post=note user=request.user community=community note=note form=form %}
                     {% else %}
                         <div class="user_note">
                             {% form_tag form=form type='note' note=note comment=comment %}

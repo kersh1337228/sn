@@ -1,0 +1,36 @@
+{% load static %}
+
+<div class="grid_cell_profile_actions">
+    {% if community.preview_picture %}
+        <div class="grid_cell_profile_actions_profile_picture">
+            <img src="{{ community.preview_picture.url }}" alt="">
+        </div>
+    {% else %}
+        <div class="grid_cell_profile_actions_profile_picture">
+            <img src="{% static 'icons/user_icon.png' %}" alt="">
+        </div>
+    {% endif %}
+    {% if community_state == 'staff_community_page' %}
+        <a href="{% url 'community_edit' community_id=community.community_id %}">
+            <div class="grid_cell_profile_actions_edit_button">Edit</div>
+        </a>
+    {% elif community_state == 'subscription_public_community_page' %}
+        <a href="{% url 'community_unsubscribe' community_id=community.community_id %}">
+            <div class="grid_cell_profile_actions_edit_button">Unsubscribe</div>
+        </a>
+    {% elif community_state == 'subscription_private_community_page' %}
+        <a href="{% url 'community_unsubscribe' community_id=community.community_id %}">
+            <div class="grid_cell_profile_actions_edit_button">Unsubscribe</div>
+        </a>
+    {% elif community_state == 'request_private_community_page' %}
+        <div class="grid_cell_profile_actions_edit_button">Request sent</div>
+    {% elif community_state == 'public_community_page' %}
+        <a href="{% url 'community_subscribe' community_id=community.community_id %}">
+            <div class="grid_cell_profile_actions_edit_button">Subscribe</div>
+        </a>
+    {% elif community_state == 'private_community_page' %}
+        <a href="{% url 'community_subscribe' community_id=community.community_id %}">
+            <div class="grid_cell_profile_actions_edit_button">Subscribe</div>
+        </a>
+    {% endif %}
+</div>

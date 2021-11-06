@@ -1,0 +1,36 @@
+{% load static %}
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form_error">{{ form.non_field_errors }}</div>
+    <div class="chat_content_grid_cell_write_message_inner_grid">
+        <div class="attach">
+            <img src="{% static 'icons/attach_icon.png' %}" width="25px" height="25px" alt="">
+            <ul class="attach_menu">
+                <li class="attach_menu_image">
+                    <img src="{% static 'icons/image_icon.png' %}" width="25px" height="25px" alt="">
+                </li>
+                <li class="attach_menu_video">
+                    <img src="{% static 'icons/video_icon.png' %}" width="25px" height="25px" alt="">
+                </li>
+                <li class="attach_menu_audio">
+                    <img src="{% static 'icons/audio_icon.png' %}" width="25px" height="25px" alt="">
+                </li>
+                <li class="attach_menu_file">
+                    <img src="{% static 'icons/file_icon.png' %}" width="25px" height="25px" alt="">
+                </li>
+            </ul>
+        </div>
+        {% for field in form %}
+            <div class="form_error">{{ field.errors }}</div>
+            {{ field }}
+        {% endfor %}
+        {% if type == 'comment' %}
+            <input type="text" name="{{ note.note_id }}" id="note_id">
+        {% elif type == 'reply' %}
+            <input type="text" name="{{ comment.comment_id }}" id="note_id">
+        {% endif %}
+        <button type="submit" class="send_message_button" name="{{ type }}_btn"></button>
+        <div class="send_message_icon">Post</div>
+    </div>
+</form>

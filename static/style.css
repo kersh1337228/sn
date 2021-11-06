@@ -40,6 +40,19 @@ textarea {
     width: 100%;
 }
 
+.form-input {
+    border: none;
+    outline: none;
+    border-radius: 10px;
+}
+
+.form-select {
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
 /*Upper navigation panel with drop-down main menu,
 audio player and settings button*/
 .navigation_bar_upper {

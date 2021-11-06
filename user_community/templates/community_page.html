@@ -1,59 +1,23 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load community_tags %}
+{% load user_tags %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
     <div class="user_page_content_grid">
-        <div class="grid_cell_profile_actions">
-            {% if community.preview_picture %}
-                <div class="grid_cell_profile_actions_profile_picture">
-                    <img src="{{ community.preview_picture.url }}" alt="">
-                </div>
-            {% endif %}
-            {% if community_state == 'staff_community_page' %}
-                <a href="{% url 'community_edit' community_id=community.community_id %}">
-                    <div class="grid_cell_profile_actions_edit_button">Edit</div>
-                </a>
-            {% elif community_state == 'subscription_public_community_page' %}
-                <a href="{% url 'community_unsubscribe' community_id=community.community_id %}">
-                    <div class="grid_cell_profile_actions_edit_button">Unsubscribe</div>
-                </a>
-            {% elif community_state == 'subscription_private_community_page' %}
-                <a href="{% url 'community_unsubscribe' community_id=community.community_id %}">
-                    <div class="grid_cell_profile_actions_edit_button">Unsubscribe</div>
-                </a>
-            {% elif community_state == 'request_private_community_page' %}
-                <div class="grid_cell_profile_actions_edit_button">Request sent</div>
-            {% elif community_state == 'public_community_page' %}
-                <a href="{% url 'community_subscribe' community_id=community.community_id %}">
-                    <div class="grid_cell_profile_actions_edit_button">Subscribe</div>
-                </a>
-            {% elif community_state == 'private_community_page' %}
-                <a href="{% url 'community_subscribe' community_id=community.community_id %}">
-                    <div class="grid_cell_profile_actions_edit_button">Subscribe</div>
-                </a>
-            {% endif %}
-        </div>
+        {% community_actions_tag community=community community_state=community_state %}
         <div class="grid_cell_personal_data">
             {{ community.name }}
         </div>
         <div class="grid_cell_add_note">
-            <form method="post">
-                {% csrf_token %}
-                {{ form.text }}
-                {{ form.images }}
-                {{ form.videos }}
-                {{ form.audios }}
-                {{ form.files }}
-                <button type="submit">Post</button>
-            </form>
+            {% form_tag form=form type='note' note=note comment=comment %}
         </div>
         <div class="grid_cell_note_list">
             {% if notes %}
                 {% for note in notes %}
-                    <div>
-                        {{ note.text }}
-                    </div>
+                    {% post_tag type='note' post=note user=request.user community=community note=note form=form %}
                 {% endfor %}
             {% else %}
                 No posts here

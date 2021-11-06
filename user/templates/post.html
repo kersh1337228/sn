@@ -25,7 +25,7 @@
     {% endif %}
     <br><div class="note_statistics">
             <div>
-                {% post_like_tag type=type user=user note=note comment=comment reply=reply %}
+                {% post_like_tag type=type post=post user=user note=note comment=comment reply=reply %}
             </div>
         {% if type == 'note' %}
             <div>
@@ -52,6 +52,8 @@
                 {% else %}
                     No comments yet
                 {% endif %}
+                {% form_tag form=form type='comment' note=note comment=comment %}
+            </div>
         {% elif type == 'comment' %}
            <br><div class="comment_replies">
                 {% if post.replies.all %}
@@ -61,26 +63,8 @@
                 {% else %}
                     No replies yet
                 {% endif %}
-        {% endif %}
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form_error">{{ form.non_field_errors }}</div>
-            <div class="chat_content_grid_cell_write_message_inner_grid">
-                {% attach_content_tag %}
-                {% for field in form %}
-                    <div class="form_error">{{ field.errors }}</div>
-                    {{ field }}
-                {% endfor %}
-                {% if type == 'note' %}
-                    <input type="text" name="{{ post.note_id }}" id="note_id">
-                    <button type="submit" class="send_message_button" name="comment_btn"></button>
-                {% elif type == 'comment' %}
-                    <input type="text" name="{{ post.comment_id }}" id="note_id">
-                    <button type="submit" class="send_message_button" name="reply_btn"></button>
-                {% endif %}
-                <div class="send_message_icon">Send</div>
+                {% form_tag form=form type='reply' note=note comment=comment %}
             </div>
-        </form>
-        </div>
+        {% endif %}
     {% endif %}
 </div>

@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load user_tags %}
+{% load community_tags %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
+    {% with request.user as user %}
     <div class="user_page_content_grid">
-        {% profile_actions_tag user=user authorised_user_state=authorised_user_state %}
+        {% community_actions_tag community=community community_state=community_state %}
         <div class="grid_cell_personal_data">
-            {{ user.first_name }} {{ user.last_name }}
+            {{ community.name }}
         </div>
         <div class="grid_cell_note_list">
             {% if notes %}
@@ -109,4 +111,5 @@
             {% endif %}
         </div>
     </div>
+    {% endwith %}
 {% endblock %}

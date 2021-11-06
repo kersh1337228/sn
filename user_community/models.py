@@ -127,7 +127,6 @@ class Community(models.Model):
     '''Staff user list'''
     staff_list = models.ManyToManyField(
         User,
-        symmetrical=False,
         related_name='staff_list',
     )
     '''Shows whether deleted or not'''
