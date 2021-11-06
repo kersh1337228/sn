@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView, FormView
 from user.views import functionally_based_view_decorator
-from user_community.forms import CommunityCreateForm, CommunityEditForm
+from user_community.forms import CommunityCreateForm, CommunityEditForm, SearchForm
 from user_community.models import Community, CommunitySubscriber, CommunitySubscribeRequest
 from user_community.utils import get_community_state
 from user_note.forms import PostAddForm
@@ -140,13 +140,33 @@ class CommunityPageEditPostView(CommunityPageView):
 
 
 '''View on which the filtered list of communities is shown'''
-class CommunityListView(LoginRequiredMixin, ListView):
+class CommunityListView(LoginRequiredMixin, ListView, FormView):
     model = Community
     template_name = 'community_list.html'
     context_object_name = 'communities'
+    form_class = SearchForm
 
     def get_queryset(self):
-        return self.request.user.community_subscribes.all()
+        if self.kwargs.get('search'):
+            return Community.objects.filter(
+                name__contains=self.kwargs.get('search')
+            )
+        else:
+            return self.request.user.community_subscribes.all()
+
+    def get_initial(self):
+        initial = super().get_initial()
+        if self.kwargs.get('search'):
+            initial.update(
+                search_text=self.kwargs.get('search')
+            )
+        return initial
+
+    def form_valid(self, form):
+        return redirect(
+            'community_search_list',
+            search=form.cleaned_data.get('search_text')
+        )
 
 
 '''View of community creation page'''
@@ -169,6 +189,7 @@ class CommunityCreateView(LoginRequiredMixin, CreateView):
             ).community_id
         )
         community.staff_list.add(self.request.user)
+        self.request.user.community_subscribes.add(community)
         return redirect(
             'community_page',
             community_id=community.community_id

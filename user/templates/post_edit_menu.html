@@ -2,21 +2,21 @@
     <ul class="note_edit_menu">
         <li class="note_edit_menu_edit">
                 <a href="
-                {% if user_id %}
-                    {% if type == 'note' %}
-                        {% url 'user_page_edit_note' user_id=user_id note_id=note_id %}
-                    {% elif type == 'comment' %}
-                        {% url 'user_page_edit_comment' user_id=user_id note_id=note_id comment_id=comment_id %}
-                    {% elif type == 'reply' %}
-                        {% url 'user_page_edit_reply' user_id=user_id note_id=note_id comment_id=comment_id reply_id=reply_id %}
-                    {% endif %}
-                {% elif community_id %}
+                {% if community_id %}
                     {% if type == 'note' %}
                         {% url 'community_page_edit_note' community_id=community_id note_id=note_id %}
                     {% elif type == 'comment' %}
                         {% url 'community_page_edit_comment' community_id=community_id note_id=note_id comment_id=comment_id %}
                     {% elif type == 'reply' %}
                         {% url 'community_page_edit_reply' community_id=community_id note_id=note_id comment_id=comment_id reply_id=reply_id %}
+                    {% endif %}
+                {% elif user_id %}
+                    {% if type == 'note' %}
+                        {% url 'user_page_edit_note' user_id=user_id note_id=note_id %}
+                    {% elif type == 'comment' %}
+                        {% url 'user_page_edit_comment' user_id=user_id note_id=note_id comment_id=comment_id %}
+                    {% elif type == 'reply' %}
+                        {% url 'user_page_edit_reply' user_id=user_id note_id=note_id comment_id=comment_id reply_id=reply_id %}
                     {% endif %}
                 {% endif %}
                 ">
@@ -25,21 +25,21 @@
         </li>
         <li class="note_edit_menu_delete">
             <a href="
-            {% if user_id %}
-                {% if type == 'note' %}
-                    {% url 'user_page_delete_note' user_id=user_id note_id=note_id %}
-                {% elif type == 'comment' %}
-                    {% url 'user_page_delete_comment' user_id=user_id note_id=note_id comment_id=comment_id %}
-                {% elif type == 'reply' %}
-                    {% url 'user_page_delete_reply' user_id=user_id note_id=note_id comment_id=comment_id reply_id=reply_id %}
-                {% endif %}
-            {% elif community_id %}
+            {% if community_id %}
                 {% if type == 'note' %}
                     {% url 'community_page_delete_note' community_id=community_id note_id=note_id %}
                 {% elif type == 'comment' %}
                     {% url 'community_page_delete_comment' community_id=community_id note_id=note_id comment_id=comment_id %}
                 {% elif type == 'reply' %}
                     {% url 'community_page_delete_reply' community_id=community_id note_id=note_id comment_id=comment_id reply_id=reply_id %}
+                {% endif %}
+            {% elif user_id %}
+                {% if type == 'note' %}
+                    {% url 'user_page_delete_note' user_id=user_id note_id=note_id %}
+                {% elif type == 'comment' %}
+                    {% url 'user_page_delete_comment' user_id=user_id note_id=note_id comment_id=comment_id %}
+                {% elif type == 'reply' %}
+                    {% url 'user_page_delete_reply' user_id=user_id note_id=note_id comment_id=comment_id reply_id=reply_id %}
                 {% endif %}
             {% endif %}
             ">

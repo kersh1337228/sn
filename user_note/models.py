@@ -203,3 +203,11 @@ class Like(models.Model):
         blank=True,
         related_name='like_to_reply'
     )
+
+    class Meta:
+        unique_together = (
+            'user',
+            'note',
+            'comment',
+            'reply'
+        )

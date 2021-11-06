@@ -1,21 +1,46 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load user_tags %}
+{% load community_tags %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-        <div class="user_list_content_grid">
+    <div class="user_list_content_grid">
+        <div class="user_list_grid_cell_search_field">
+            {% search_tag form=form %}
+        </div>
+        <div class="user_list_grid_cell_user_list">
         {% if communities %}
-            <div class="user_list_grid_cell_search_field">Search</div>
             {% for community in communities %}
-                <div class="user_list_grid_cell_user_list">
-                    {% if community.preview_picture %}
-                        <img src="{{ community.preview_picture.url }}" alt="">
-                    {% endif %}
-                    {{ community.name }}
+                <div class="user_list_grid_cell_user">
+                    <div class="community_header">
+                        <a href="{% url 'community_page' community_id=community.community_id %}">
+                            {% if community.preview_picture %}
+                                <img src="{{ community.preview_picture.url }}" alt="" width="50px" height="50px" class="preview_picture">
+                            {% else %}
+                                <img src="{% static 'icons/user_icon.png' %}" alt="" width="50px" height="50px" class="preview_picture">
+                            {% endif %}
+                        </a>
+                        <a href="{% url 'community_page' community_id=community.community_id %}">
+                            <div class="community_name">{{ community.name }}</div>
+                        </a>
+                    </div>
+                    <div class="community_type">
+                        {% if community.is_public %}
+                            Public community
+                        {% else %}
+                            Private community
+                        {% endif %}
+                    </div>
+                    <div class="note_time">
+                        Created: {{ community.creation_date|date:'d-m-Y' }}
+                    </div>
                 </div>
             {% endfor %}
         {% else %}
-            <div class="feed_grid_cell_search_field">You have no communities yet</div>
+            No communities
         {% endif %}
+        </div>
     </div>
 {% endblock %}

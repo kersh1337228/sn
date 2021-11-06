@@ -15,7 +15,7 @@
             {% endif %}
         </div>
         <div>
-            {% post_edit_menu_tag type=type user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id reply_id=reply.reply_id %}
+            {% post_edit_menu_tag type=type community_id=community.community_id user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id reply_id=reply.reply_id %}
         </div>
     </div>
     <br><div>{{ post.text }}</div><br>
@@ -47,7 +47,7 @@
             <br><div class="note_comments">
                 {% if post.comments.all %}
                     {% for comment in post.comments.all %}
-                        {% post_tag type='comment' post=comment user=user comment=comment note=note form=form %}
+                        {% post_tag type='comment' post=comment user=user community=community comment=comment note=note form=form %}
                     {% endfor %}
                 {% else %}
                     No comments yet
@@ -58,7 +58,7 @@
            <br><div class="comment_replies">
                 {% if post.replies.all %}
                     {% for reply in post.replies.all %}
-                        {% post_tag type='reply' post=reply user=user note=note comment=comment reply=reply %}
+                        {% post_tag type='reply' post=reply user=user community=community note=note comment=comment reply=reply %}
                     {% endfor %}
                 {% else %}
                     No replies yet

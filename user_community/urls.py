@@ -1,8 +1,8 @@
 from django.urls import path
 
-from user.views import like_view
+from user.views import like_view, delete_view
 from user_community.views import CommunityCreateView, CommunityPageView, CommunityListView, \
-    CommunityEditView, CommunityDeleteView, subscribe_view, unsubscribe_view
+    CommunityEditView, CommunityDeleteView, subscribe_view, unsubscribe_view, CommunityPageEditPostView
 
 urlpatterns = [
     # Community page
@@ -16,6 +16,12 @@ urlpatterns = [
         'list/',
         CommunityListView.as_view(),
         name='community_list'
+    ),
+    # Community search list
+    path(
+        'list/<slug:search>/',
+        CommunityListView.as_view(),
+        name='community_search_list'
     ),
     # Community creation page
     path(
@@ -44,5 +50,42 @@ urlpatterns = [
         'unsubscribe/<slug:community_id>/',
         unsubscribe_view,
         name='community_unsubscribe'
+    ),
+    # Edit and delete
+
+    # Notes
+    path(
+        'edit/community/<slug:community_id>/<slug:note_id>/',
+        CommunityPageEditPostView.as_view(),
+        name='community_page_edit_note'
+    ),
+    path(
+        'delete/community/<slug:community_id>/<slug:note_id>/',
+        delete_view,
+        name='community_page_delete_note'
+    ),
+
+    # Comments
+    path(
+        'edit/community/<slug:community_id>/<slug:note_id>/<slug:comment_id>/',
+        CommunityPageEditPostView.as_view(),
+        name='community_page_edit_comment',
+    ),
+    path(
+        'delete/community/<slug:community_id>/<slug:note_id>/<slug:comment_id>/',
+        delete_view,
+        name='community_page_delete_comment',
+    ),
+
+    # Replies
+    path(
+        'edit/community/<slug:community_id>/<slug:note_id>/<slug:comment_id>/<slug:reply_id>/',
+        CommunityPageEditPostView.as_view(),
+        name='community_page_edit_reply',
+    ),
+    path(
+        'delete/community/<slug:community_id>/<slug:note_id>/<slug:comment_id>/<slug:reply_id>/',
+        delete_view,
+        name='community_page_delete_reply',
     ),
 ]

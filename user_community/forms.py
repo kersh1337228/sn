@@ -85,3 +85,16 @@ class CommunityEditForm(ModelForm):
                 attrs={'class': 'form-input'}
             ),
         }
+
+
+'''Form to search objects by their names'''
+class SearchForm(forms.Form):
+    search_text = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-input',
+                'placeholder': 'Search'
+            }
+        )
+    )

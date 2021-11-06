@@ -1,0 +1,14 @@
+{% load static %}
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form_error">{{ form.non_field_errors }}</div>
+    <div class="form_error">{{ form.search_text.errors }}</div>
+    <div class="search_form">
+        {{ form.search_text }}
+        <button type="submit" id="search_button">Search</button>
+        <div class="search_icon">
+            <img src="{% static 'icons/search_icon.png' %}" alt="" width="20px" height="20px">
+        </div>
+    </div>
+</form>

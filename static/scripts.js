@@ -141,3 +141,9 @@ if ($('.reply_icon')) {
     }
     reply_button.click(reply_menu_switch)
 }
+
+if ($('#search_button')) {
+    $('.search_icon').click(()=> {
+        $('#search_button').click()
+    })
+}

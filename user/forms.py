@@ -57,6 +57,15 @@ class UserRegisterForm(UserCreationForm):
             ),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget = self.fields['password2'].widget = forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password',
+                'class': 'form-input',
+            }
+        )
+
     '''Phone number validation'''
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
