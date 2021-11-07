@@ -6,7 +6,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-{#    <script src="{% static 'chat_ajax.js' %}"></script>#}
+    <script src="{% static 'chat_ajax.js' %}"></script>
     <div class="chat_content_grid">
         <div class="chat_content_grid_cell_companion_data">
             {% if request.user != chat.member_1 %}
