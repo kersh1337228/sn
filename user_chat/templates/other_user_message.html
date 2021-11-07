@@ -1,0 +1,23 @@
+{% load static %}
+
+<div class="chat_other_user_message">
+    <div class="message_info">
+        <div class="message_edit">...
+            <ul class="message_edit_menu">
+                <li>
+                    <img src="{% static 'icons/reply_icon.png' %}" alt="" width="20px" height="20px" class="message_reply_icon">
+                </li>
+                <li>
+                    <img src="{% static 'icons/forward_icon.png' %}" alt="" width="20px" height="20px" class="message_forward_icon">
+                </li>
+            </ul>
+        </div>
+        <div>{{ message.text }}</div>
+    </div>
+    <div class="message_info">
+        <div class="message_time">{{ message.publish_time|date:'d-m-Y H:i:s' }}</div>
+        {% if message.update_time != message.publish_time  %}
+            <div class="message_time">{{ message.update_time|date:'d-m-Y H:i:s' }}</div>
+        {% endif %}
+    </div>
+</div>

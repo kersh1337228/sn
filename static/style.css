@@ -121,8 +121,11 @@ audio player and settings button*/
 /*Profile actions cell, containing profile picture
 and edit/subscribe/add friend buttons*/
 .grid_cell_profile_actions {
-    /*width: 100%;*/
-    /*height: 100%;*/
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: minmax(min-content, max-content);
+    grid-gap: 20px 20px;
+
     background: rgb(60, 60, 60);
     border-radius: 10px;
     padding: 20px 20px 20px 20px;
@@ -153,10 +156,11 @@ and edit/subscribe/add friend buttons*/
 
 /*Edit/subscribe/add friend buttons*/
 .grid_cell_profile_actions_edit_button {
+    font-size: 14px;
+
     background: rgb(90, 90, 90);
     border-radius: 10px;
     padding: 10px;
-    margin: 15% 0 0 0;
     text-align: center;
 
     transition: background 0.7s;
@@ -317,6 +321,17 @@ and edit/subscribe/add friend buttons*/
     padding: 20px 20px 20px 20px;
 }
 
+.user_request_cell {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    background: rgb(70, 70, 70);
+    border-radius: 10px;
+    padding: 20px 20px 20px 20px;
+}
+
 .form_content_grid {
     display: grid;
     position: absolute;
@@ -349,21 +364,21 @@ and edit/subscribe/add friend buttons*/
     min-height: 390px;
 
     grid-template-columns: 1fr;
-    grid-template-rows: 40px auto auto;
+    grid-auto-rows: minmax(min-content, max-content);
     grid-gap: 15px 35px;
 }
 
 .chat_content_grid_cell_companion_data {
     display: flex;
     flex-direction: row;
-    justify-content: left;
-
-    width: 100%;
+    justify-content: space-between;
+    align-items: center;
 
     background: rgb(50, 50, 50);
 
     border-radius: 10px;
     padding: 20px 20px 20px 20px;
+    font-weight: bold;
 
     grid-column-start: 1;
     grid-column-end: 1;
@@ -372,8 +387,6 @@ and edit/subscribe/add friend buttons*/
 }
 
 .chat_content_grid_cell_messages {
-    width: 100%;
-
     background: rgb(50, 50, 50);
 
     border-radius: 10px;
@@ -390,8 +403,6 @@ and edit/subscribe/add friend buttons*/
 }
 
 .chat_content_grid_cell_write_message {
-    width: 100%;
-
     background: rgb(50, 50, 50);
 
     border-radius: 10px;
@@ -404,7 +415,8 @@ and edit/subscribe/add friend buttons*/
 }
 
 #id_images, #id_videos, #id_audios, #id_files,
-.send_message_button, #note_id, #search_button {
+#send_message_button, .send_message_button,
+#note_id, #search_button {
     display: none;
 }
 
@@ -418,40 +430,57 @@ and edit/subscribe/add friend buttons*/
     position: absolute;
     display: flex;
     flex-direction: column;
-    padding: 0 0 0 0;
+    padding: 10px 10px 10px 10px;
 
-    background: rgb(50, 50, 50);
+    background: rgb(30, 30, 30);
     border-radius: 10px;
 
     z-index: 3;
 
     visibility: hidden;
-    transform: translate(0, -100%);
+    transform: translate(-15%, -100%);
     transition: 0.3s;
 }
 
 .chat_content_grid_cell_write_message_inner_grid {
     display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+    justify-content: space-between;
+    align-content: center;
 
     color: white;
 
     width: 100%;
     height: auto;
     padding: 0 0;
-
-    flex-direction: row;
-    column-gap: 10px;
-    justify-content: space-between;
 }
 
 .send_message_icon {
     cursor: pointer;
+    width: 25px;
+    height: 25px;
 }
 
 .chat_current_user_message {
-    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
     background: rgb(70, 70, 70);
+    border-radius: 10px;
+    padding: 20px 20px 20px 20px;
+
+    font-size: 14px;
+}
+
+.chat_other_user_message {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    background: rgb(40, 40, 40);
     border-radius: 10px;
     padding: 20px 20px 20px 20px;
 
@@ -462,7 +491,6 @@ and edit/subscribe/add friend buttons*/
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: flex-start;
 }
 
 .message_sender_full_name {
@@ -471,6 +499,7 @@ and edit/subscribe/add friend buttons*/
 
 .message_time {
     font-size: 10px;
+    margin-top: 5px;
 }
 
 .message_edit {
@@ -483,13 +512,13 @@ and edit/subscribe/add friend buttons*/
     position: absolute;
     display: flex;
     flex-direction: column;
-    padding: 0 0 0 0;
+    padding: 10px 10px 10px 10px;
 
-    background: rgb(50, 50, 50);
+    background: rgb(30, 30, 30);
     border-radius: 10px;
 
     visibility: hidden;
-    transform: translate(0, -100%);
+    transform: translate(-15px, -100px);
     transition: 0.3s;
 }
 
@@ -526,9 +555,9 @@ and edit/subscribe/add friend buttons*/
     position: absolute;
     display: flex;
     flex-direction: column;
-    padding: 0 0 0 0;
+    padding: 10px 10px 10px 10px;
 
-    background: rgb(50, 50, 50);
+    background: rgb(30, 30, 30);
     border-radius: 10px;
 
     visibility: hidden;

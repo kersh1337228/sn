@@ -1,26 +1,37 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load user_tags %}
+{% load chat_tags %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
+{#    <script src="{% static 'chat_ajax.js' %}"></script>#}
     <div class="chat_content_grid">
         <div class="chat_content_grid_cell_companion_data">
             {% if request.user != chat.member_1 %}
-                {% if chat.member_1.profile_picture %}
-                    <div><a href="{% url 'user_page' user_id=chat.member_1.user_id %}">
-                        <img src="{{ chat.member_1.profile_picture.url }}" alt="">
-                    </a></div>
-                {% endif %}
-                <a href="{% url 'user_page' user_id=chat.member_1.user_id %}"><div>
+                    <a href="{% url 'user_page' user_id=chat.member_1.user_id %}">
+                        <img src="
+                        {% if chat.member_1.profile_picture %}
+                            {{ chat.member_1.profile_picture.url }}
+                        {% else %}
+                            {% static 'icons/user_icon.png' %}
+                        {% endif %}
+                        " alt="" height="40px" width="40px" class="preview_picture">
+                    </a>
+                <a href="{% url 'user_page' user_id=chat.member_1.user_id %}">
                     {{ chat.member_1.first_name }} {{ chat.member_1.last_name }}
-                </a></div>
+                </a>
             {% else %}
-                {% if chat.member_2.profile_picture %}
-                    <div><a href="{% url 'user_page' user_id=chat.member_2.user_id %}">
-                        <img src="{{ chat.member_2.profile_picture.url }}" alt="">
-                    </a></div>
-                {% endif %}
+                <div><a href="{% url 'user_page' user_id=chat.member_2.user_id %}">
+                    <img src="
+                    {% if chat.member_2.profile_picture %}
+                        {{ chat.member_2.profile_picture.url }}
+                    {% else %}
+                        {% static 'icons/user_icon.png' %}
+                    {% endif %}
+                    " alt="" height="40px" width="40px" class="preview_picture">
+                </a></div>
                 <div><a href="{% url 'user_page' user_id=chat.member_2.user_id %}">
                     {{ chat.member_2.first_name }} {{ chat.member_2.last_name }}
                 </a></div>
@@ -29,76 +40,18 @@
         <div class="chat_content_grid_cell_messages">
             {% if chat.messages.all %}
                 {% for message in chat.messages.all %}
-                    <div {% if message.sender == request.user %}
-                        class="chat_current_user_message"
+                    {% if message.sender == request.user %}
+                        {% current_user_message_tag message=message chat=chat %}
                     {% else %}
-                        class="chat_other_user_message"
-                    {% endif %}>
-                        <div class="message_info">
-                            <div class="message_sender_full_name">
-                                <a href="{% url 'user_page' user_id=message.sender.user_id %}">
-                                    {{ message.sender.first_name }} {{ message.sender.last_name }}
-                                </a>
-                            </div>
-                            <div>
-                                <div class="message_edit">
-                                    ...
-                                    <ul class="message_edit_menu">
-                                        <li class="message_edit_menu_edit">
-                                            <a href="{% url 'private_chat_edit_message' chat_id=chat.chat_id message_id=message.message_id %}">
-                                                Edit
-                                            </a>
-                                        </li>
-                                        <li class="message_edit_menu_delete">
-                                            <a href="{% url 'private_chat_delete_message' chat_id=chat.chat_id message_id=message.message_id %}">
-                                                Delete
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <br><div>{{ message.text }}</div><br>
-                        <div class="message_time">{{ message.publish_time }}</div>
-                        {% if message.update_time != message.publish_time  %}
-                            <div class="message_time">{{ message.update_time }}</div>
-                        {% endif %}
-                    </div>
+                        {% other_user_message_tag message=message chat=chat %}
+                    {% endif %}
                 {% endfor %}
             {% else %}
                 No messages yet
             {% endif %}
         </div>
         <div class="chat_content_grid_cell_write_message">
-            <form method="post">
-                {% csrf_token %}
-                <div class="form_error">{{ form.non_field_errors }}</div>
-                <div class="chat_content_grid_cell_write_message_inner_grid">
-                    <div id="attach">
-                        <img src="{% static 'icons/attach_icon.png' %}" width="25px" height="25px" alt="">
-                        <ul class="attach_menu">
-                            <li class="attach_menu_image">
-                                <img src="{% static 'icons/image_icon.png' %}" width="25px" height="25px" alt="">
-                            </li>
-                            <li class="attach_menu_video">
-                                <img src="{% static 'icons/video_icon.png' %}" width="25px" height="25px" alt="">
-                            </li>
-                            <li class="attach_menu_audio">
-                                <img src="{% static 'icons/audio_icon.png' %}" width="25px" height="25px" alt="">
-                            </li>
-                            <li class="attach_menu_file">
-                                <img src="{% static 'icons/file_icon.png' %}" width="25px" height="25px" alt="">
-                            </li>
-                        </ul>
-                    </div>
-                    {% for field in form %}
-                        <div class="form_error">{{ field.errors }}</div>
-                        {{ field }}
-                    {% endfor %}
-                    <button type="submit" id="send_message_button"></button>
-                    <div class="send_message_icon"><img src="{% static 'icons/send_message_icon.png' %}" width="20px" height="20px" alt=""></div>
-                </div>
-            </form>
+            {% form_tag form=form type='message' %}
         </div>
     </div>
 {% endblock %}

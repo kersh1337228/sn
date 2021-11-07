@@ -52,10 +52,9 @@ def get_user_state(current_user, authorized_user):
         if authorized_user in current_user.friends.all():
             return 'friend_user_page'
         else:
-            friend_requests_list = [
-                request.from_user for request in current_user.friend_requests.all()
-            ]
-            if authorized_user in friend_requests_list:
+            if current_user in [request.from_user for request in authorized_user.friend_requests.all()]:
+                return 'request_await_user_page'
+            elif authorized_user in [request.from_user for request in current_user.friend_requests.all()]:
                 if current_user.is_public:
                     return 'request_public_user_page'
                 else:

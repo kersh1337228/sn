@@ -4,6 +4,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView
+
+from user.views import functionally_based_view_decorator
 from user_friend.models import UserFriendRequest, Friend
 
 
@@ -32,43 +34,41 @@ class FriendRequestListView(LoginRequiredMixin, ListView):
 
 '''View of answering on friend request'''
 @login_required
+@functionally_based_view_decorator
 def friend_request_result(request, user_id, result):
-    if request.user.is_active:
-        current_user = request.user
-        request_user = get_object_or_404(User, user_id=user_id)
-        if result == 'accept':
-            friend = Friend(
-                from_user=request_user,
-                to_user=current_user,
-            )
-            friend.save()
-            current_user.friends.add(request_user)
-        current_user.friend_requests.get(from_user=request_user).delete()
-        return redirect('friend_requests')
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect('error.html', context=context)
+    current_user = request.user
+    request_user = get_object_or_404(User, user_id=user_id)
+    if result == 'accept':
+        friend = Friend(
+            from_user=request_user,
+            to_user=current_user,
+        )
+        friend.save()
+        current_user.friends.add(request_user)
+    current_user.friend_requests.get(from_user=request_user).delete()
+    return redirect(request.META['HTTP_REFERER'])
 
 
 '''View of sending friend request'''
 @login_required
+@functionally_based_view_decorator
 def add_friend_view(request, friend_id):
-    if request.user.is_active:
-        Friend = get_object_or_404(User, user_id=friend_id)
-        friend_request = UserFriendRequest(
-                from_user=request.user,
-                to_user=Friend,
-                state=None,
-            )
-        friend_request.save()
-        Friend.friend_requests.add(friend_request)
-        return redirect('user_page', friend_id)
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect('error.html', context=context)
+    friend = get_object_or_404(User, user_id=friend_id)
+    friend_request = UserFriendRequest(
+            from_user=request.user,
+            to_user=friend,
+            state=None,
+        )
+    friend_request.save()
+    friend.friend_requests.add(friend_request)
+    return redirect(request.META['HTTP_REFERER'])
+
+
+'''View of deleting user from your friend list'''
+@login_required
+@functionally_based_view_decorator
+def delete_friend_view(request, friend_id):
+    friend = get_object_or_404(User, user_id=friend_id)
+    request.user.friends.remove(friend)
+    friend.friends.remove(request.user)
+    return redirect(request.META['HTTP_REFERER'])

@@ -1,0 +1,31 @@
+{% load static %}
+
+<div class="chat_current_user_message">
+    <div class="message_info">
+        <div>{{ message.text }}</div>
+        <div class="message_edit">...
+            <ul class="message_edit_menu">
+                <li>
+                    <img src="{% static 'icons/reply_icon.png' %}" alt="" width="20px" height="20px" class="message_reply_icon">
+                </li>
+                <li>
+                    <img src="{% static 'icons/forward_icon.png' %}" alt="" width="20px" height="20px" class="message_forward_icon">
+                </li>
+                <li class="message_edit_menu_edit">
+                    <a href="{% url 'private_chat_edit_message' chat_id=chat.chat_id message_id=message.message_id %}">
+                        <img src="{% static 'icons/edit_icon.png' %}" alt="" width="20px" height="20px" class="message_reply_icon">
+                    </a>
+                </li>
+                <li class="message_edit_menu_delete">
+                    <a href="{% url 'private_chat_delete_message' chat_id=chat.chat_id message_id=message.message_id %}">
+                        <img src="{% static 'icons/delete_icon.png' %}" alt="" width="20px" height="20px" class="message_reply_icon">
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="message_time">{{ message.publish_time|date:'d-m-Y H:i:s' }}</div>
+    {% if message.update_time != message.publish_time  %}
+        <div class="message_time">{{ message.update_time|date:'d-m-Y H:i:s' }}</div>
+    {% endif %}
+</div>

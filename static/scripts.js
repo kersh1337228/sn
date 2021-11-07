@@ -14,11 +14,11 @@ if($('.attach')) {
         if (attach_menu.style.visibility === 'visible') {
             attach_menu.style.visibility = 'hidden'
             attach_menu.style.opacity = '0'
-            attach_menu.style.transform = 'translate(0, -100%)'
+            attach_menu.style.transform = 'translate(-15%, -100%)'
         } else {
             attach_menu.style.visibility = 'visible'
             attach_menu.style.opacity  = '1'
-            attach_menu.style.transform = 'translate(0, -140%)'
+            attach_menu.style.transform = 'translate(-15%, -140%)'
         }
     }
     attach_button.click(attach_menu_switch)
@@ -36,6 +36,8 @@ if($('.attach')) {
             $(this)[0].parentElement.children.namedItem('comment_btn').click()
         } else if ($(this)[0].parentElement.children.namedItem('reply_btn')) {
             $(this)[0].parentElement.children.namedItem('reply_btn').click()
+        } else if ($(this)[0].parentElement.children.namedItem('message_btn')) {
+            $(this)[0].parentElement.children.namedItem('message_btn').click()
         }
     })
 }
@@ -63,15 +65,14 @@ if($('.message_edit')) {
     let message_edit_menu = $('.message_edit_menu')
     let message_edit_menu_switch = function (){
         let message_edit_menu = $(this)[0].lastElementChild
-        console.dir(message_edit_menu)
         if (message_edit_menu.style.visibility === 'visible') {
             message_edit_menu.style.visibility = 'hidden'
             message_edit_menu.style.opacity = '0'
-            message_edit_menu.style.transform = 'translate(0, -100%)'
+            message_edit_menu.style.transform = 'translate(-15px, -100%)'
         } else {
             message_edit_menu.style.visibility = 'visible'
             message_edit_menu.style.opacity  = '1'
-            message_edit_menu.style.transform = 'translate(0, -170%)'
+            message_edit_menu.style.transform = 'translate(-15px, -140%)'
         }
     }
     message_edit_button.click(message_edit_menu_switch)

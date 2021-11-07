@@ -64,17 +64,15 @@ class SendMessageForm(forms.ModelForm):
         }
 
     def save(self, commit=True, user=None, chat=None):
-        images = self.cleaned_data.pop('images')
-        videos = self.cleaned_data.pop('videos')
-        audios = self.cleaned_data.pop('audios')
-        files = self.cleaned_data.pop('files')
-
+        media = {
+            'images': self.cleaned_data.pop('images'),
+            'videos': self.cleaned_data.pop('videos'),
+            'audios': self.cleaned_data.pop('audios'),
+            'files': self.cleaned_data.pop('files'),
+        }
         self.cleaned_data['sender'] = user
         message = Message(**self.cleaned_data)
-        message = note_attach_media(images, 'image', 'user', user, message)
-        message = note_attach_media(videos, 'video', 'user', user, message)
-        message = note_attach_media(audios, 'audio', 'user', user, message)
-        message = note_attach_media(files, 'file', 'user', user, message)
+        message = attach_media(media, 'user', user, message)
         message.save()
         chat.messages.add(message)
 
