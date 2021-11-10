@@ -29,7 +29,7 @@ if($('.attach')) {
     $('.attach_menu_video').click(()=>{$('#id_videos').click()})
     $('.attach_menu_audio').click(()=>{$('#id_audios').click()})
     $('.attach_menu_file').click(()=>{$('#id_files').click()})
-    $('.send_message_icon').click(function() {
+    $('.content').on('click', '.send_message_icon', function() {
         if ($(this)[0].parentElement.children.namedItem('note_btn')) {
             $(this)[0].parentElement.children.namedItem('note_btn').click()
         } else if ($(this)[0].parentElement.children.namedItem('comment_btn')) {
@@ -75,7 +75,8 @@ if($('.message_edit')) {
             message_edit_menu.style.transform = 'translate(-15px, -140%)'
         }
     }
-    message_edit_button.click(message_edit_menu_switch)
+    $('.chat_content_grid_cell_messages').on('click', '.message_edit', message_edit_menu_switch)
+    // message_edit_button.on('click', message_edit_menu_switch)
     // attach_menu.mouseover(attach_menu_switch)
 }
 

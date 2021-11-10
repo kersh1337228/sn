@@ -5,22 +5,18 @@
         <div>{{ message.text }}</div>
         <div class="message_edit">...
             <ul class="message_edit_menu">
-                <li>
-                    <img src="{% static 'icons/reply_icon.png' %}" alt="" width="20px" height="20px" class="message_reply_icon">
-                </li>
-                <li>
-                    <img src="{% static 'icons/forward_icon.png' %}" alt="" width="20px" height="20px" class="message_forward_icon">
-                </li>
+                <li><img src="{% static 'icons/reply_icon.png' %}" alt=""
+                         width="20px" height="20px" class="message_reply_icon"></li>
+                <li><img src="{% static 'icons/forward_icon.png' %}" alt=""
+                         width="20px" height="20px" class="message_forward_icon"></li>
                 <li class="message_edit_menu_edit">
-                    <a href="{% url 'private_chat_edit_message' chat_id=chat.chat_id message_id=message.message_id %}">
-                        <img src="{% static 'icons/edit_icon.png' %}" alt="" width="20px" height="20px" class="message_reply_icon">
-                    </a>
-                </li>
+                    <img src="{% static 'icons/edit_icon.png' %}"
+                            alt="" width="20px" height="20px"
+                            class="message_{{ message.message_id }}_edit_icon"></li>
                 <li class="message_edit_menu_delete">
-                    <a href="{% url 'private_chat_delete_message' chat_id=chat.chat_id message_id=message.message_id %}">
-                        <img src="{% static 'icons/delete_icon.png' %}" alt="" width="20px" height="20px" class="message_reply_icon">
-                    </a>
-                </li>
+                    <img src="{% static 'icons/delete_icon.png' %}"
+                            alt="" width="20px" height="20px"
+                            class="message_{{ message.message_id }}_delete_icon"></li>
             </ul>
         </div>
     </div>
@@ -28,4 +24,59 @@
     {% if message.update_time != message.publish_time  %}
         <div class="message_time">{{ message.update_time|date:'d-m-Y H:i:s' }}</div>
     {% endif %}
+    <script>
+        $('.chat_current_user_message').on('click', '.message_{{ message.message_id }}_edit_icon', function (){
+            $.ajax({
+                type: 'GET',
+                url: '{% url 'private_chat_edit_message' chat_id=chat.chat_id message_id=message.message_id %}',
+                data: {},
+                success: function (response) {
+                    let message = $('.message_{{ message.message_id }}_edit_icon')
+                        .parent().parent().parent().parent().parent()
+                    message.replaceWith(
+                        `<div class="chat_current_user_message">${response.form}</div>`
+                    )
+                    $('.chat_current_user_message > form').attr('class', 'edit_form')
+                    $('.edit_form #id_text').val(response.initial['text'])
+                    $('.edit_form #id_images').val(response.initial['images'])
+                    $('.edit_form #id_videos').val(response.initial['videos'])
+                    $('.edit_form #id_audios').val(response.initial['audios'])
+                    $('.edit_form #id_files').val(response.initial['files'])
+                },
+                error: function (response) {
+                    alert('error')
+                }
+            })
+        })
+        $('.chat_current_user_message').on('click', '.message_{{ message.message_id }}_delete_icon', function (){
+            let message = $(this)[0].parentElement.parentElement.parentElement.parentElement.parentElement
+            $.ajax({
+                url: '{% url 'private_chat_delete_message' chat_id=chat.chat_id message_id=message.message_id %}',
+                type: 'DELETE',
+                success: function (response) {
+                    message.remove()
+                },
+                error: function (response) {
+                    alert('error')
+                }
+            })
+        })
+        $(document).ready(function () {
+            $('.chat_content_grid_cell_messages').on('submit', '.edit_form', function (event) {
+                event.preventDefault()
+                $.ajax({
+                    type: 'POST',
+                    url: `{% url 'private_chat_edit_message' chat_id=chat.chat_id message_id=message.message_id %}`,
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        $('.edit_form').trigger('reset')
+                        $('.edit_form').parent().replaceWith(response.message)
+                    },
+                    error: function (response) {
+                        alert('error')
+                    }
+                })
+            })
+        })
+    </script>
 </div>

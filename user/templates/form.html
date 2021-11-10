@@ -1,6 +1,6 @@
 {% load static %}
 
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" class="form">
     {% csrf_token %}
     <div class="form_error">{{ form.non_field_errors }}</div>
     <div class="chat_content_grid_cell_write_message_inner_grid">
@@ -29,6 +29,8 @@
             <input type="text" name="{{ note.note_id }}" id="note_id">
         {% elif type == 'reply' %}
             <input type="text" name="{{ comment.comment_id }}" id="note_id">
+        {% elif type == 'message' %}
+            <input type="text" name="{{ message.message_id }}" id="note_id">
         {% endif %}
         <button type="submit" class="send_message_button" name="{{ type }}_btn"></button>
         <div class="send_message_icon">

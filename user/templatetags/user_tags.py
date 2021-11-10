@@ -27,3 +27,7 @@ def post_like_tag(**kwargs):
 @register.inclusion_tag('form.html')
 def form_tag(**kwargs):
     return kwargs
+
+@register.inclusion_tag('form_ajax.html')
+def form_ajax_tag(**kwargs):
+    return kwargs

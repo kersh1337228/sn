@@ -1,0 +1,15 @@
+<script>
+    $('form').submit(function () {
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'private_chat' chat_id=chat.chat_id %}',
+            data: $(this).serialize(),
+            success: function (response) {
+                $('form').trigger('reset')
+            },
+            error: function (response) {
+                alert('error')
+            }
+        })
+    })
+</script>

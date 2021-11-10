@@ -6,7 +6,6 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-    <script src="{% static 'chat_ajax.js' %}"></script>
     <div class="chat_content_grid">
         <div class="chat_content_grid_cell_companion_data">
             {% if request.user != chat.member_1 %}
@@ -54,4 +53,41 @@
             {% form_tag form=form type='message' %}
         </div>
     </div>
+    <script>
+        $(document).ready(function () {
+            {#setInterval(function (){#}
+            {#    $.ajax({#}
+            {#    type: 'GET',#}
+            {#    url: '{% url 'private_chat' chat_id=chat.chat_id %}',#}
+            {#    data: {},#}
+            {#    success: function (response) {#}
+            {#        console.log(response.messages)#}
+                    {#let message = $('.message_{{ message.message_id }}_edit_icon')#}
+                    {#    .parent().parent().parent().parent().parent()#}
+                    {#message.replaceWith(#}
+                    {#    `<div class="chat_current_user_message">${response.form}</div>`#}
+                    {#)#}
+            {#    },#}
+            {#    error: function (response) {#}
+            {#        alert('error')#}
+            {#    }#}
+            //{)}, 1000)
+            $('.chat_content_grid_cell_write_message').on('submit', '.form', function (event) {
+                event.preventDefault()
+                console.log('CREATE')
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url 'private_chat' chat_id=chat.chat_id %}',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        $('.form').trigger('reset')
+                        $('.chat_content_grid_cell_messages').append(response.message)
+                    },
+                    error: function (response) {
+                        alert('error')
+                    }
+                })
+            })
+        })
+    </script>
 {% endblock %}
