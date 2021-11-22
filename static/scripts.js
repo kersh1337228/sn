@@ -7,21 +7,18 @@ if ($('.grid_cell_profile_actions_profile_picture')) {
 
 if($('.attach')) {
     // attach button interaction animation
-    let attach_button = $('.attach')
-    let attach_menu = $('.attach_menu')
-    let attach_menu_switch = function() {
-        let attach_menu = $(this)[0].lastElementChild
-        if (attach_menu.style.visibility === 'visible') {
-            attach_menu.style.visibility = 'hidden'
-            attach_menu.style.opacity = '0'
-            attach_menu.style.transform = 'translate(-15%, -100%)'
+    $('.content').on('click', '.attach', function() {
+        let attach_menu = $(this).parent().children('.attach_menu')
+        if (attach_menu.css('visibility') === 'visible') {
+            attach_menu.css('visibility', 'hidden')
+            attach_menu.css('opacity', '0')
+            attach_menu.css('transform', 'translate(-20%, 0%)')
         } else {
-            attach_menu.style.visibility = 'visible'
-            attach_menu.style.opacity  = '1'
-            attach_menu.style.transform = 'translate(-15%, -140%)'
+            attach_menu.css('visibility', 'visible')
+            attach_menu.css('opacity', '1')
+            attach_menu.css('transform', 'translate(-20%, 70%)')
         }
-    }
-    attach_button.click(attach_menu_switch)
+    })
     // attach_menu.mouseover(attach_menu_switch)
 
     // attach menu buttons functional
@@ -29,34 +26,32 @@ if($('.attach')) {
     $('.attach_menu_video').click(()=>{$('#id_videos').click()})
     $('.attach_menu_audio').click(()=>{$('#id_audios').click()})
     $('.attach_menu_file').click(()=>{$('#id_files').click()})
-    $('.send_message_icon').click(function() {
-        if ($(this)[0].parentElement.children.namedItem('note_btn')) {
-            $(this)[0].parentElement.children.namedItem('note_btn').click()
-        } else if ($(this)[0].parentElement.children.namedItem('comment_btn')) {
-            $(this)[0].parentElement.children.namedItem('comment_btn').click()
-        } else if ($(this)[0].parentElement.children.namedItem('reply_btn')) {
-            $(this)[0].parentElement.children.namedItem('reply_btn').click()
-        } else if ($(this)[0].parentElement.children.namedItem('message_btn')) {
-            $(this)[0].parentElement.children.namedItem('message_btn').click()
-        }
+    $('.content').on('click', '.send_message_icon', function() {
+        $(this).parent().children('button').click()
     })
 }
 
 // textarea automatic height correction
 if ($('textarea')) {
-    let textarea = $('textarea')
-    let textarea_size = function() {
-        if ($(this).outerHeight() > this.scrollHeight) {
-            $(this).height(1)
-        }
-        while ($(this).outerHeight() < this.scrollHeight) {
-            $(this).height($(this).height() + 1)
-        }
-    }
-    textarea.on('paste input', textarea_size)
-    if (textarea.text()) {
-        textarea.trigger('input')
-    }
+    // let textarea = $('textarea')
+    // let textarea_size = function() {
+    //     if ($(this).outerHeight() > this.scrollHeight) {
+    //         $(this).height(1)
+    //     }
+    //     while ($(this).outerHeight() < this.scrollHeight) {
+    //         $(this).height($(this).height() + 1)
+    //     }
+    // }
+    // textarea.on('paste input', textarea_size)
+    //
+    $("textarea").each(function () {
+        // this.setAttribute("style", "height:" + (this.scrollHeight) + "px;");
+        this.style.height = (this.scrollHeight * 0.8) + "px";
+    }).on("paste input", function () {
+        this.style.height = "auto";
+        this.style.height = (this.scrollHeight * 0.8) + "px";
+    });
+    $('textarea').trigger('input')
 }
 
 if($('.message_edit')) {
@@ -75,7 +70,8 @@ if($('.message_edit')) {
             message_edit_menu.style.transform = 'translate(-15px, -140%)'
         }
     }
-    message_edit_button.click(message_edit_menu_switch)
+    $('.chat_content_grid_cell_messages').on('click', '.message_edit', message_edit_menu_switch)
+    // message_edit_button.on('click', message_edit_menu_switch)
     // attach_menu.mouseover(attach_menu_switch)
 }
 

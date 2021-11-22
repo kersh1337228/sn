@@ -48,6 +48,10 @@ class SendMessageForm(forms.ModelForm):
         },
     )
 
+    def __init__(self, *args, **kwargs):
+        super(SendMessageForm, self).__init__(*args, **kwargs)
+        self.fields['text'].required = False
+
     class Meta:
         model = Message
         fields = [
@@ -65,17 +69,16 @@ class SendMessageForm(forms.ModelForm):
 
     def save(self, commit=True, user=None, chat=None):
         media = {
-            'images': self.cleaned_data.pop('images'),
-            'videos': self.cleaned_data.pop('videos'),
-            'audios': self.cleaned_data.pop('audios'),
-            'files': self.cleaned_data.pop('files'),
+            'images': self.cleaned_data.pop('images', []),
+            'videos': self.cleaned_data.pop('videos', []),
+            'audios': self.cleaned_data.pop('audios', []),
+            'files': self.cleaned_data.pop('files', []),
         }
         self.cleaned_data['sender'] = user
         message = Message(**self.cleaned_data)
         message = attach_media(media, 'user', user, message)
         message.save()
         chat.messages.add(message)
-
         return message
 
 

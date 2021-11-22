@@ -16,6 +16,7 @@
         </ul>
     </header>
     <div class="content">{% block content %}{% endblock %}</div>
+    {% block javascript %}{% endblock %}
     <script type="text/javascript" src="{% static 'scripts.js' %}"></script>
 </body>
 </html>

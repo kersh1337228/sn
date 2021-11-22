@@ -26,7 +26,10 @@ SECRET_KEY = 'django-insecure-@+gpcr53qi79q#7nghjfdahq+jq&pjnxu9yg&$%@#_sh#-cwvo
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    '192.168.1.65',
+]
 
 
 # Application definition
@@ -40,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'phonenumber_field',
+    'channels',
+    'rest_framework',
 
     'user.apps.UserConfig',
     'user_note.apps.UserNoteConfig',
@@ -137,6 +142,20 @@ STATICFILES_DIRS = ['static', 'user_chat/static']
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+ASGI_APPLICATION = 'Socialize.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                ('localhost', 6379),
+            ],
+        },
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

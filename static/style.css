@@ -420,10 +420,16 @@ and edit/subscribe/add friend buttons*/
     display: none;
 }
 
-#attach {
+.attach, .attach_menu_image, .attach_menu_video,
+.attach_menu_audio, .attach_menu_file, .send_message_icon {
     cursor: pointer;
-    width: 25px;
-    height: 25px;
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+
+.attach:hover, .attach_menu_image:hover, .attach_menu_video:hover,
+.attach_menu_audio:hover, .attach_menu_file:hover, .send_message_icon:hover {
+    opacity: 0.5;
 }
 
 .attach_menu {
@@ -432,7 +438,7 @@ and edit/subscribe/add friend buttons*/
     flex-direction: column;
     padding: 10px 10px 10px 10px;
 
-    background: rgb(30, 30, 30);
+    background: inherit;
     border-radius: 10px;
 
     z-index: 3;
@@ -448,6 +454,7 @@ and edit/subscribe/add friend buttons*/
     column-gap: 10px;
     justify-content: space-between;
     align-content: center;
+    align-items: center;
 
     color: white;
 
@@ -457,9 +464,7 @@ and edit/subscribe/add friend buttons*/
 }
 
 .send_message_icon {
-    cursor: pointer;
-    width: 25px;
-    height: 25px;
+    border-radius: 10px;
 }
 
 .chat_current_user_message {
@@ -674,4 +679,14 @@ and edit/subscribe/add friend buttons*/
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+
+.edit_message_block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.edit_cancel_icon {
+    cursor: pointer;
 }

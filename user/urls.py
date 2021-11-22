@@ -9,7 +9,7 @@ from user.views import UserPageView, UserAuthenticationView, \
 urlpatterns = [
     # User page
     path(
-        'user/<slug:user_id>/',
+        '<slug:user_id>/',
         UserPageView.as_view(),
         name='user_page'
     ),
@@ -17,21 +17,21 @@ urlpatterns = [
     # Like
     # Notes
     path(
-        'like/user/<slug:user_id>/<slug:note_id>/<slug:action>/',
+        '<slug:user_id>/<slug:note_id>/<slug:action>/',
         like_view,
         name='like_note',
     ),
 
     # Comments
     path(
-        'like/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:action>/',
+        '<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:action>/',
         like_view,
         name='like_comment',
     ),
 
     # Replies
     path(
-        'like/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:reply_id>/<slug:action>/',
+        '<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:reply_id>/<slug:action>/',
         like_view,
         name='like_reply',
     ),
@@ -40,36 +40,36 @@ urlpatterns = [
     # Edit and delete
     # Notes
     path(
-        'edit/user/<slug:user_id>/<slug:note_id>/',
+        '<slug:user_id>/edit/<slug:note_id>/',
         UserPageEditPostView.as_view(),
         name='user_page_edit_note'
     ),
     path(
-        'delete/user/<slug:user_id>/<slug:note_id>/',
+        '<slug:user_id>/delete/<slug:note_id>/',
         delete_view,
         name='user_page_delete_note'
     ),
 
     # Comments
     path(
-        'edit/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/',
+        '<slug:user_id>/<slug:note_id>/edit/<slug:comment_id>/',
         UserPageEditPostView.as_view(),
         name='user_page_edit_comment',
     ),
     path(
-        'delete/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/',
+        '<slug:user_id>/<slug:note_id>/delete/<slug:comment_id>/',
         delete_view,
         name='user_page_delete_comment',
     ),
 
     # Replies
     path(
-        'edit/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:reply_id>/',
+        '<slug:user_id>/<slug:note_id>/<slug:comment_id>/edit/<slug:reply_id>/',
         UserPageEditPostView.as_view(),
         name='user_page_edit_reply',
     ),
     path(
-        'delete/user/<slug:user_id>/<slug:note_id>/<slug:comment_id>/<slug:reply_id>/',
+        '<slug:user_id>/<slug:note_id>/<slug:comment_id>/delete/<slug:reply_id>/',
         delete_view,
         name='user_page_delete_reply',
     ),
@@ -77,12 +77,12 @@ urlpatterns = [
 
     # Authentication urls
     path(
-        'signin/',
+        'auth/signin/',
         UserAuthenticationView.as_view(),
         name='sign_in'
     ),
     path(
-        'signup/',
+        'auth/signup/',
         UserRegisterView.as_view(),
         name='sign_up'
     ),
@@ -95,7 +95,7 @@ urlpatterns = [
         name='change_user_profile_picture'
     ),
     path(
-        'settings/',
+        'settings/list/',
         UserSettingsView.as_view(),
         name='user_settings'
     ),

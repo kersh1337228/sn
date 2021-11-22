@@ -2,12 +2,16 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.forms import model_to_dict
+from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import FormView, CreateView, ListView, DetailView
+
+from user.views import functionally_based_view_decorator
 from .forms import CreateGroupChatForm, SendMessageForm
-from .models import PrivateChat, GroupChat
+from .models import PrivateChat, GroupChat, Message
+from .serializers import MessageSerializer
 from .utils import ChatMixin, ExtraContentMixin
 
 
@@ -54,44 +58,27 @@ PrivateChatEditMessageView allowing
 to edit message you have already sent
 '''
 class PrivateChatEditMessageView(PrivateChatView):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse(
+            {'form': render_to_string(
+                 'form.html',
+                 {'form': self.get_form_class()(initial=self.get_initial()),
+                  'type': 'message',
+                  'message': get_object_or_404(
+                      Message,
+                      message_id=self.kwargs.get('message_id')
+                  )},
+                 request=request,
+             )},
+            status=200)
+
     def get_initial(self):
-        initial = super().get_initial()
-        initial.update(
-            **model_to_dict(
-                self.get_object().messages.get(message_id=self.kwargs.get('message_id'))
+        serializer = MessageSerializer(
+            self.get_object().messages.get(
+                message_id=self.kwargs.get('message_id')
             )
         )
-        return initial
-
-    def form_valid(self, form):
-        self.get_object().messages.get(message_id=self.kwargs.get('message_id')).delete()
-        form.cleaned_data['message_id'] = self.kwargs.get('message_id')
-        form.save(user=self.request.user, chat=self.get_object())
-        return super(ChatMixin, self).form_valid(form)
-
-
-'''
-private_chat_delete_message_view allowing
-to delete the message you have already sent
-'''
-@login_required
-def private_chat_delete_message_view(request, chat_id, message_id):
-    user = request.user
-    if user.is_active:
-        PrivateChat.objects.get(chat_id=chat_id).messages.get(message_id=message_id).delete()
-        return redirect(
-            'private_chat',
-            chat_id=chat_id
-        )
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect(
-            'error.html',
-            context=context
-        )
+        return serializer.data
 
 
 '''
@@ -109,36 +96,26 @@ create_private_chat_view allowing to create
 private chat between current user and another
 '''
 @login_required
+@functionally_based_view_decorator
 def create_private_chat_view(request, member_id):
-    user = request.user
-    if user.is_active:
-        member = get_object_or_404(User, user_id=member_id)
-        try:
-            private_chat = PrivateChat.objects.get(
-                Q(member_1=user, member_2=member) |
-                Q(member_2=user, member_1=member)
-            )
-        except:
-            private_chat = PrivateChat(
-                member_1=user,
-                member_2=member,
-            )
-            private_chat.save()
-            user.private_chats.add(private_chat)
-            member.private_chats.add(private_chat)
-        return redirect(
-            'private_chat',
-            chat_id=private_chat.chat_id
+    member = get_object_or_404(User, user_id=member_id)
+    try:
+        private_chat = PrivateChat.objects.get(
+            Q(member_1=request.user, member_2=member) |
+            Q(member_2=request.user, member_1=member)
         )
-    else:
-        context = {
-            'title': 'Error',
-            'error_message': 'No such user',
-        }
-        return redirect(
-            'error.html',
-            context=context
+    except:
+        private_chat = PrivateChat(
+            member_1=request.user,
+            member_2=member,
         )
+        private_chat.save()
+        request.user.private_chats.add(private_chat)
+        member.private_chats.add(private_chat)
+    return redirect(
+        'private_chat',
+        chat_id=private_chat.chat_id
+    )
 
 
 '''
@@ -164,3 +141,16 @@ class CreateGroupChatView(LoginRequiredMixin, FormView, CreateView):
             'group_chat',
             chat_id=GroupChat.objects.get(name=form.cleaned_data.get('name')).chat_id
         )
+
+
+@login_required
+@functionally_based_view_decorator
+def get_message_view(request, chat_id, message_id):
+    return JsonResponse(
+        {'message': render_to_string(
+            'current_user_message.html',
+            {'message': get_object_or_404(Message, message_id=message_id),
+             'chat': get_object_or_404(PrivateChat, chat_id=chat_id)}
+        )},
+        status=200
+    )

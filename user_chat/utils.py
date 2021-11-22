@@ -9,7 +9,7 @@ from .forms import SendMessageForm
 
 class ChatMixin(LoginRequiredMixin, DetailView, FormView):
     context_object_name = 'chat'
-    template_name = 'chat.html'
+    template_name = 'private_chat.html'
     slug_url_kwarg = 'chat_id'
     form_class = SendMessageForm
 
