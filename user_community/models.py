@@ -85,6 +85,7 @@ class Community(models.Model):
     preview_picture = models.ImageField(
         upload_to=upload_to_community_picture,
         blank=True,
+        default='static/icons/user_icon.png'
     )
     '''Community contact data'''
     website = models.URLField(

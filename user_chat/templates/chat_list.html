@@ -1,23 +1,54 @@
 {% extends 'base.html' %}
 
+{% load chat_tags %}
+{% load static %}
+
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
     <div class="user_list_content_grid">
-        {% if private_chats or group_chats %}
-            <div class="user_list_grid_cell_search_field">Search</div>
-            {% for chat in private_chats %}
-                <a href="{% url 'private_chat' chat_id=chat.chat_id %}">
-                    <div class="user_list_grid_cell_user_list">{{ chat.chat_id }}</div>
-                </a>
-            {% endfor %}
-            {% for chat in group_chats %}
-                <a href="{% url 'group_chat' chat_id=chat.chat_id %}">
-                    <div class="user_list_grid_cell_user_list">{{ chat.chat_id }}</div>
-                </a>
-            {% endfor %}
-        {% else %}
-            <div class="feed_grid_cell_search_field">You have no chats yet</div>
-        {% endif %}
+        <div class="user_list_grid_cell_search_field">
+            <input type="text" name="search_text">
+        </div>
+        <div class="chat_type_filter"><ul>
+            <li class="chat_type_filter_selected">All</li>
+            <li>Private</li>
+            <li>Group</li>
+        </ul></div>
+        <div class="chat_list_cell">
+            {% if chats %}
+                {% for chat in chats %}
+                    {% chat_min_tag chat=chat request=request private_chats=private_chats group_chats=group_chats %}
+                {% endfor %}
+            {% else %}
+                No chats yet
+            {% endif %}
+        </div>
     </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            $('.chat_type_filter').on('click', 'ul > li', function () {
+                if ($(this).attr('class') != 'chat_type_filter_selected') {
+                    $('.chat_type_filter > ul > li').attr('class', null)
+                    $(this).attr('class', 'chat_type_filter_selected')
+                    $.ajax({
+                        type: 'GET',
+                        url: `{% url 'get_chats' %}`,
+                        data: {'filter': $(this).text().toLowerCase()},
+                        success: function (response) {
+                            $('.chat_list_cell').replaceWith(
+                                `<div class="chat_list_cell">${response.chats}</div>`
+                            )
+                        },
+                        error: function (response) {
+                            alert('error')
+                        }
+                    })
+                }
+            })
+        })
+    </script>
 {% endblock %}

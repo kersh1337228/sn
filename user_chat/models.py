@@ -6,6 +6,7 @@ from django.db import models
 User = get_user_model()
 
 
+'''Path for uploading group chat picture'''
 def upload_to_picture(instance, filename):
     now = datetime.datetime.now().strftime('%Y/%m/%d')
     return f'{instance.chat_id}/images/chat_picture/{now}/{filename}'
@@ -58,6 +59,7 @@ class Message(models.Model):
     )
 
 
+'''Private chat between 2 users'''
 class PrivateChat(models.Model):
     member_1 = models.ForeignKey(
         User,
@@ -93,6 +95,7 @@ class PrivateChat(models.Model):
         return self.chat_id
 
 
+'''Group chat between multiple users'''
 class GroupChat(models.Model):
     members = models.ManyToManyField(
         User,
@@ -105,6 +108,7 @@ class GroupChat(models.Model):
     picture = models.ImageField(
         upload_to=upload_to_picture,
         blank=True,
+        default='static/icons/user_icon.png'
     )
     staff = models.ManyToManyField(
         User,

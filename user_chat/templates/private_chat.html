@@ -6,7 +6,6 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-    <script src="{% static 'chat_ajax.js' %}"></script>
     <div class="chat_content_grid">
         <div class="chat_content_grid_cell_companion_data">
             {% if request.user != chat.member_1 %}
@@ -65,23 +64,28 @@
             )
             // When getting message from server
             chatSocket.onmessage = function(event) {
-                // If deleting
-                if (event.data.startsWith('delete')) {
-                    let message = $(`.message_${event.data.slice(6)}_delete_icon`).parent().parent().parent().parent().parent()
-                    message.remove()
-                    if ($('.chat_current_user_message').length === 0 && $('.chat_other_user_message').length === 0) {
-                        $('.chat_content_grid_cell_messages').text('No messages yet')
+                console.log(event)
+                if (!event.data.startsWith('list')) {
+                    // If deleting
+                    if (event.data.startsWith('delete')) {
+                        let message = $(`.message_${event.data.slice(6)}_delete_icon`).parent().parent().parent().parent().parent()
+                        message.remove()
+                        if ($('.chat_current_user_message').length === 0 && $('.chat_other_user_message').length === 0) {
+                            $('.chat_content_grid_cell_messages').text('No messages yet')
+                        }
+                    // If updating
+                    } else if (event.data.startsWith('edit')) {
+                        const message_html =
+                        $('.').replaceWith(event.data.slice(4))
+                        $('.edit_form').parent().parent().replaceWith(event.data.slice(4))
+                    // If creating
+                    } else {
+                        let messages_grid = $('.chat_content_grid_cell_messages')
+                        if('No messages yet' === messages_grid[0].innerText) {
+                            messages_grid.text('')
+                        }
+                        messages_grid.append(event.data)
                     }
-                // If updating
-                } else if (event.data.startsWith('edit')) {
-                    $('.edit_form').parent().replaceWith(event.data.slice(4))
-                // If creating
-                } else {
-                    let messages_grid = $('.chat_content_grid_cell_messages')
-                    if('No messages yet' === messages_grid[0].innerText) {
-                        messages_grid.text('')
-                    }
-                    messages_grid.append(event.data)
                 }
             }
             // Form data serialization

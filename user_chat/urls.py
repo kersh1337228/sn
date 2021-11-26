@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import PrivateChatView, GroupChatView, \
     create_private_chat_view, CreateGroupChatView, \
-    ChatListView, PrivateChatEditMessageView, get_message_view
+    ChatListView, PrivateChatEditMessageView, get_message_view, get_chats_view
 
 urlpatterns = [
     path(
@@ -39,4 +39,9 @@ urlpatterns = [
         get_message_view,
         name='get_message'
     ),
+    path(
+        'get_chats/',
+        get_chats_view,
+        name='get_chats'
+    )
 ]

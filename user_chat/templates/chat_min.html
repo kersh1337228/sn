@@ -1,0 +1,81 @@
+{% load community_tags %}
+{% load static %}
+
+{% if chat in private_chats %}
+    <a href="{% url 'private_chat' chat_id=chat.chat_id %}">
+        <div class="chat_cell">
+            {% if request.user != chat.member_1 %}
+                <img class="chat_picture" src="{% if chat.member_1.profile_picture %}
+                    {{ chat.member_1.profile_picture.url }}
+                {% else %}
+                    {% static 'icons/user_icon.png' %}
+                {% endif %}" alt="" width="50px" height="50px">
+                <div class="chat_text">
+                <div class="chat_name">{{ chat.member_1.first_name }} {{ chat.member_1.last_name }}</div>
+            {% else %}
+                <img class="chat_picture" src="{% if chat.member_2.profile_picture %}
+                    {{ chat.member_2.profile_picture.url }}
+                {% else %}
+                    {% static 'icons/user_icon.png' %}
+                {% endif %}" alt="" width="50px" height="50px">
+                <div class="chat_text">
+                <div class="chat_name">{{ chat.member_2.first_name }} {{ chat.member_2.last_name }}</div>
+            {% endif %}
+            {% if chat.messages %}
+                {% with chat.messages.all.last as last_message %}
+                    {% if last_message.sender == request.user %}
+                        <div class="chat_current_last_message">{{ last_message.text|slice:40 }}...</div>
+                    {% else %}
+                        <div class="chat_other_last_message">{{ last_message.text|slice:40 }}...</div>
+                    {% endif %}
+                        <div class="message_time" style="padding-left: 5px">
+                        {% if message.update_time == message.publish_time  %}
+                            {{ last_message.publish_time|date:'d-m-Y H:i:s' }}
+                        {% else %}
+                            {{ last_message.update_time|date:'d-m-Y H:i:s' }}
+                        {% endif %}
+                        </div>
+                    </div>
+                {% endwith %}
+            {% else %}
+                <div class="chat_no_messages">No messages yet</div>
+            {% endif %}
+        </div>
+    </a>
+{% else %}
+    <a href="{% url 'group_chat' chat_id=chat.chat_id %}"></a>
+{% endif %}
+
+{% block javascript %}
+    <script>
+        // WebSocket initialization
+        const chatSocket = new WebSocket(
+            `ws://${window.location.host}/chats/private_chat/{{ chat.chat_id }}/`
+        )
+        // When getting message from server
+        chatSocket.onmessage = function(event) {
+            if (event.data.startsWith('list')) {
+                {% with chat.messages.all.last as last_message %}
+                {% if last_message.sender == request.user %}
+                    $('a[href$=/{{ chat.chat_id }}/] .chat_current_last_message').replaceWith(
+                        `<div class="chat_current_last_message">{{ last_message.text|slice:40 }}...</div>`
+                    )
+                {% else %}
+                    $('a[href$=/{{ chat.chat_id }}/] .chat_other_last_message').replaceWith(
+                        `<div class="chat_other_last_message">{{ last_message.text|slice:40 }}...</div>`
+                    )
+                {% endif %}
+                    $('a[href$=/{{ chat.chat_id }}/] .message_time').replaceWith(
+                        `<div class="message_time" style="padding-left: 5px">
+                        {% if message.update_time == message.publish_time  %}
+                            {{ last_message.publish_time|date:'d-m-Y H:i:s' }}
+                        {% else %}
+                            {{ last_message.update_time|date:'d-m-Y H:i:s' }}
+                        {% endif %}
+                        </div>`
+                    )
+            {% endwith %}
+            }
+        }
+    </script>
+{% endblock %}

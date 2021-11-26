@@ -1,5 +1,3 @@
-import datetime
-
 from django import forms
 from django.core.exceptions import ValidationError
 from multiupload import fields
@@ -7,6 +5,7 @@ from .models import Message, GroupChat
 from user_note.utils import attach_media
 
 
+'''Get user friend list for select widget'''
 def get_user_friends(instance):
     friends = instance.user.friends.all()
     choices = []

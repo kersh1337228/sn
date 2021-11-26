@@ -690,3 +690,105 @@ and edit/subscribe/add friend buttons*/
 .edit_cancel_icon {
     cursor: pointer;
 }
+
+.chat_list_cell {
+    min-width: 278px;
+
+    background: rgb(50, 50, 50);
+
+    border-radius: 10px;
+
+    padding: 20px 20px 20px 20px;
+
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start: 3;
+    grid-row-end: 3;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: minmax(min-content, max-content);
+    grid-gap: 20px;
+}
+
+.chat_cell {
+    display: grid;
+    grid-auto-columns: 50px auto;
+    grid-gap: 0 10px;
+    padding: 20px 20px 20px 20px;
+    background: rgb(70, 70, 70);
+    border-radius: 10px;
+    transition: 0.7s;
+}
+
+.chat_cell:hover {
+    background: rgb(100, 100, 100);
+    color: white;
+}
+
+.chat_picture {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 1;
+    grid-column-end: 1;
+    border-radius: 10px;
+}
+
+.chat_text {
+    grid-row-start: 1;
+    grid-row-end: 1;
+    grid-column-start: 2;
+    grid-column-end: 2;
+}
+
+.chat_name {
+    font-weight: bold;
+    font-size: 14px;
+    padding-left: 5px;
+}
+
+.chat_current_last_message {
+    max-width: max-content;
+    border-radius: 10px;
+    padding: 5px 5px 5px 5px;
+    background: rgb(60, 60, 60);
+    font-size: 12px;
+}
+
+.chat_other_last_message {
+    max-width: max-content;
+    border-radius: 10px;
+    padding: 5px 5px 5px 5px;
+    background: rgb(50, 50, 50);
+    font-size: 15px;
+    font-weight: lighter;
+}
+
+.chat_type_filter {
+    grid-row-start: 2;
+    grid-row-end: 2;
+    grid-column-start: 1;
+    grid-column-end: 1;
+
+    padding: 20px 20px 20px 20px;
+    background: rgb(60, 60, 60);
+    border-radius: 10px;
+}
+
+.chat_type_filter ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+
+    cursor: pointer;
+}
+
+.chat_type_filter_selected {
+    text-decoration: underline;
+    cursor: default;
+}
+
+

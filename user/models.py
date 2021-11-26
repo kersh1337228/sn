@@ -179,6 +179,7 @@ class User(AbstractBaseUser):
     profile_picture = models.ImageField(
         upload_to=upload_to_profile_picture,
         blank=True,
+        default='static/icons/user_icon.png'
     )
     cities_list = [
         (
