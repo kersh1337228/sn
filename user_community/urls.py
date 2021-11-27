@@ -19,7 +19,7 @@ urlpatterns = [
     ),
     # Community search list
     path(
-        'list/<slug:search>/',
+        'list/search/',
         CommunityListView.as_view(),
         name='community_search_list'
     ),

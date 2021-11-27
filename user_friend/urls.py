@@ -9,6 +9,11 @@ urlpatterns = [
         FriendListView.as_view(),
         name='friend_list'
     ),
+    path(
+        'friend_list/search/',
+        FriendListView.as_view(),
+        name='friend_list_search'
+    ),
     # Current user friend requests list
     path(
         'friend_requests/',

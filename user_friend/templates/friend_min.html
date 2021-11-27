@@ -1,0 +1,26 @@
+{% load static %}
+
+<div class="friend_cell">
+    <a href="{% url 'user_page' user_id=friend.user_id %}">
+    <img alt="" class="chat_picture" src="{% if friend.profile_picture %}
+        {{ friend.profile_picture.url }}
+    {% else %}
+        {% static 'icons/user_icon.png' %}
+    {% endif %}" height="50px" width="50px"></a>
+    <div class="friend_text">
+        <a href="{% url 'user_page' user_id=friend.user_id %}">
+            {{ friend.first_name }} {{ friend.last_name }}
+        </a>
+        <div class="friend_actions_button">...
+            <ul class="friend_actions_menu">
+                <li><a href="{% url 'create_private_chat' member_id=friend.user_id %}">
+                    Write message
+                </a></li>
+                <li><a href="{% url 'delete_friend' friend_id=friend.user_id %}">
+                    Unfriend
+                </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+

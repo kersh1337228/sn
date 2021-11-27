@@ -9,6 +9,6 @@ def community_actions_tag(**kwargs):
     return kwargs
 
 
-@register.inclusion_tag('search.html')
-def search_tag(**kwargs):
+@register.inclusion_tag('community_min.html')
+def community_min_tag(**kwargs):
     return kwargs

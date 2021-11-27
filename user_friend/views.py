@@ -1,7 +1,13 @@
+from itertools import chain
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Value
+from django.db.models.functions import Concat
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 
@@ -17,6 +23,37 @@ class FriendListView(LoginRequiredMixin, ListView):
     model = User
     template_name = 'friend_list.html'
     context_object_name = 'friend_list'
+
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax():
+            friends_html = ''
+            friend_list = []
+            if request.GET.get('search'):
+                friend_list = request.user.friends.annotate(
+                    friend_full_name=Concat(
+                        'first_name',
+                        Value(' '),
+                        'last_name',
+                    )
+                ).filter(
+                    friend_full_name__icontains=request.GET.get('search')
+                )
+            else:
+                friend_list = request.user.friends.all()
+            if friend_list:
+                for friend in friend_list:
+                    friends_html += render_to_string(
+                        'friend_min.html',
+                        {
+                            'friend': friend,
+                            'request': request,
+                        }
+                    )
+            else:
+                friends_html = 'No matching friends'
+            return JsonResponse({'friends': friends_html}, status=200)
+        else:
+            return super(FriendListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         return self.request.user.friends.all()

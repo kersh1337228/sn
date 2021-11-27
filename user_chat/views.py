@@ -3,14 +3,14 @@ from itertools import chain
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
+from django.db.models import Q, Value
+from django.db.models.functions import Concat
 from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import FormView, CreateView, ListView, DetailView
 from user.views import functionally_based_view_decorator
-from user_community.forms import SearchForm
 from .forms import CreateGroupChatForm, SendMessageForm
 from .models import PrivateChat, GroupChat, Message
 from .serializers import MessageSerializer
@@ -49,10 +49,62 @@ class ChatMixin(LoginRequiredMixin, DetailView, FormView):
 
 
 '''ChatListView allowing to see user's chat list'''
-class ChatListView(LoginRequiredMixin, ListView, FormView):
+class ChatListView(LoginRequiredMixin, ListView):
     model = PrivateChat
     template_name = 'chat_list.html'
-    form_class = SearchForm
+
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax():
+            chats_html = ''
+            chat_list = []
+            if request.GET.get('search'):
+                chat_list = list(chain(
+                    request.user.private_chats.all().annotate(
+                        member_1_full_name=Concat(
+                            'member_1__first_name',
+                            Value(' '),
+                            'member_1__last_name',
+                        ),
+                        member_2_full_name=Concat(
+                            'member_2__first_name',
+                            Value(' '),
+                            'member_2__last_name',
+                        ),
+                    ).filter(
+                        Q(
+                            member_1=request.user,
+                            member_2_full_name__icontains=request.GET.get('search'),
+                        ) |
+                        Q(
+                            member_1_full_name__icontains=request.GET.get('search'),
+                            member_2=request.user,
+                        )
+                    ),
+                    request.user.group_chats.filter(
+                        name__icontains=request.GET.get('search'),
+                    )
+                ))
+            else:
+                chat_list = list(chain(
+                    request.user.private_chats.all(),
+                    request.user.group_chats.all()
+                ))
+            if chat_list:
+                for chat in chat_list:
+                    chats_html += render_to_string(
+                        'chat_min.html',
+                        {
+                            'chat': chat,
+                            'request': request,
+                            'private_chats': request.user.private_chats.all(),
+                            'group_chats': request.user.group_chats.all(),
+                        }
+                    )
+            else:
+                chats_html = 'No matching chats'
+            return JsonResponse({'chats': chats_html}, status=200)
+        else:
+            return super(ChatListView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = kwargs

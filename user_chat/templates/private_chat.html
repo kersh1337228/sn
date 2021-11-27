@@ -64,28 +64,27 @@
             )
             // When getting message from server
             chatSocket.onmessage = function(event) {
-                console.log(event)
-                if (!event.data.startsWith('list')) {
-                    // If deleting
-                    if (event.data.startsWith('delete')) {
-                        let message = $(`.message_${event.data.slice(6)}_delete_icon`).parent().parent().parent().parent().parent()
-                        message.remove()
-                        if ($('.chat_current_user_message').length === 0 && $('.chat_other_user_message').length === 0) {
-                            $('.chat_content_grid_cell_messages').text('No messages yet')
-                        }
-                    // If updating
-                    } else if (event.data.startsWith('edit')) {
-                        const message_html =
-                        $('.').replaceWith(event.data.slice(4))
-                        $('.edit_form').parent().parent().replaceWith(event.data.slice(4))
-                    // If creating
-                    } else {
-                        let messages_grid = $('.chat_content_grid_cell_messages')
-                        if('No messages yet' === messages_grid[0].innerText) {
-                            messages_grid.text('')
-                        }
-                        messages_grid.append(event.data)
+                let data = JSON.parse(event.data)
+                // If deleting
+                if (data.mode === 'delete') {
+                    $(`.message_${data.message_id}_delete_icon`).parent().parent().parent().
+                    parent().parent().remove()
+                    if ($('.chat_current_user_message').length === 0 &&
+                        $('.chat_other_user_message').length === 0) {
+                        $('.chat_content_grid_cell_messages').text('No messages yet')
                     }
+                // If updating
+                } else if (data.mode === 'edit') {
+                    $('.edit_form').parent().parent().replaceWith(data.message_html)
+                    $(`.message_${data.message_id}_delete_icon`).parent().parent().
+                    parent().parent().parent().replaceWith(data.message_html)
+                // If creating
+                } else if (data.mode === 'send') {
+                    let messages_grid = $('.chat_content_grid_cell_messages')
+                    if('No messages yet' === messages_grid[0].innerText) {
+                        messages_grid.text('')
+                    }
+                    messages_grid.append(data.message_html)
                 }
             }
             // Form data serialization
@@ -103,6 +102,7 @@
                 let data = getFormData($(this))
                 data['user_id'] = '{{ request.user.user_id }}'
                 data['chat_id'] = '{{ chat.chat_id }}'
+                data['mode'] = 'send'
                 chatSocket.send(JSON.stringify(data))
                 $(this).trigger('reset')
             })
@@ -110,8 +110,9 @@
             $('.chat_content_grid_cell_messages').on('click', 'img[class$="_delete_icon"]', function (){
                 const re = /^message_([\w]+)_delete_icon$/
                 chatSocket.send(JSON.stringify({
-                    "delete":  true,
+                    "mode": "delete",
                     "message_id": $(this).attr('class').match(re)[1],
+                    "chat_id": '{{ chat.chat_id }}',
                 }))
             })
             // Update message
@@ -120,7 +121,7 @@
                 const message_id = $('#note_id').attr('name')
                 $('#note_id').remove()
                 let data = getFormData($(this))
-                data["edit"] = true
+                data["mode"] = "edit"
                 data["message_id"] = message_id
                 data["chat_id"] = '{{ chat.chat_id }}'
                 chatSocket.send(JSON.stringify(data))

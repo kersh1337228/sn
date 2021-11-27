@@ -22,6 +22,7 @@
                 <div class="chat_name">{{ chat.member_2.first_name }} {{ chat.member_2.last_name }}</div>
             {% endif %}
             {% if chat.messages %}
+                <div class="chat_last_message">
                 {% with chat.messages.all.last as last_message %}
                     {% if last_message.sender == request.user %}
                         <div class="chat_current_last_message">{{ last_message.text|slice:40 }}...</div>
@@ -35,7 +36,8 @@
                             {{ last_message.update_time|date:'d-m-Y H:i:s' }}
                         {% endif %}
                         </div>
-                    </div>
+                </div>
+                </div>
                 {% endwith %}
             {% else %}
                 <div class="chat_no_messages">No messages yet</div>
@@ -48,34 +50,36 @@
 
 {% block javascript %}
     <script>
-        // WebSocket initialization
-        const chatSocket = new WebSocket(
-            `ws://${window.location.host}/chats/private_chat/{{ chat.chat_id }}/`
-        )
-        // When getting message from server
-        chatSocket.onmessage = function(event) {
-            if (event.data.startsWith('list')) {
-                {% with chat.messages.all.last as last_message %}
-                {% if last_message.sender == request.user %}
-                    $('a[href$=/{{ chat.chat_id }}/] .chat_current_last_message').replaceWith(
-                        `<div class="chat_current_last_message">{{ last_message.text|slice:40 }}...</div>`
-                    )
-                {% else %}
-                    $('a[href$=/{{ chat.chat_id }}/] .chat_other_last_message').replaceWith(
-                        `<div class="chat_other_last_message">{{ last_message.text|slice:40 }}...</div>`
-                    )
-                {% endif %}
-                    $('a[href$=/{{ chat.chat_id }}/] .message_time').replaceWith(
-                        `<div class="message_time" style="padding-left: 5px">
-                        {% if message.update_time == message.publish_time  %}
-                            {{ last_message.publish_time|date:'d-m-Y H:i:s' }}
-                        {% else %}
-                            {{ last_message.update_time|date:'d-m-Y H:i:s' }}
-                        {% endif %}
-                        </div>`
-                    )
-            {% endwith %}
+        $(document).ready(function () {
+            // WebSocket initialization
+            const chatSocket = new WebSocket(
+                `ws://${window.location.host}/chats/private_chat/{{ chat.chat_id }}/`
+            )
+            // When getting message from server
+            chatSocket.onmessage = function(event) {
+                let data = JSON.parse(event.data)
+                let last_message = data.last_message; let html
+                if (last_message.sender === '{{ request.user.user_id }}') {
+                    html = `<div class="chat_last_message">
+                                    <div class="chat_current_last_message">
+                                        ${last_message.text.slice(0, 40)}...
+                                    </div>
+                                    <div class="message_time" style="padding-left: 5px">
+                                        ${last_message.last_time}
+                                    </div>
+                                 </div>`
+                } else {
+                    html = `<div class="chat_last_message">
+                                    <div class="chat_other_last_message">
+                                        ${last_message.text.slice(0, 40)}...
+                                    </div>
+                                    <div class="message_time" style="padding-left: 5px">
+                                        ${last_message.last_time}
+                                    </div>
+                                 </div>`
+                }
+                $('a[href="{% url 'private_chat' chat_id=chat.chat_id %}"] .chat_last_message').replaceWith(html)
             }
-        }
+        })
     </script>
 {% endblock %}

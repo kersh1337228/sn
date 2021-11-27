@@ -10,6 +10,11 @@ urlpatterns = [
         name='chat_list'
     ),
     path(
+        'chat_list/search/',
+        ChatListView.as_view(),
+        name='chat_list_search',
+    ),
+    path(
         'private_chat/<slug:chat_id>/',
         PrivateChatView.as_view(),
         name='private_chat'

@@ -1,0 +1,25 @@
+{% load static %}
+
+{% with request.from_user as user %}
+    <div class="user_request_cell">
+        <a href="{% url 'user_page' user_id=user.user_id %}">
+        <img src="{% if user.profile_picture %}
+            {{ user.profile_picture.url }}
+        {% else %}
+            {% static 'icons/user_icon.png' %}
+        {% endif %}
+        " alt="" height="50px" width="50px" class="chat_picture">
+        </a>
+        <a href="{% url 'user_page' user_id=user.user_id %}">
+            <div class="note_poster_full_name">
+            {{ user.first_name }} {{ user.last_name }}
+            </div>
+        </a>
+        <a href="{% url 'friend_requests_result' user_id=user.user_id result='accept' %}">
+            <div class="grid_cell_profile_actions_edit_button">Accept</div>
+        </a>
+        <a href="{% url 'friend_requests_result' user_id=user.user_id result='reject' %}">
+            <div class="grid_cell_profile_actions_edit_button">Reject</div>
+        </a>
+    </div>
+{% endwith %}

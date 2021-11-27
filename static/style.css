@@ -732,6 +732,12 @@ and edit/subscribe/add friend buttons*/
     grid-column-start: 1;
     grid-column-end: 1;
     border-radius: 10px;
+    opacity: 1;
+    transition: 0.7s;
+}
+
+.chat_picture:hover {
+    opacity: 0.5;
 }
 
 .chat_text {
@@ -760,8 +766,7 @@ and edit/subscribe/add friend buttons*/
     border-radius: 10px;
     padding: 5px 5px 5px 5px;
     background: rgb(50, 50, 50);
-    font-size: 15px;
-    font-weight: lighter;
+    font-size: 12px;
 }
 
 .chat_type_filter {
@@ -791,4 +796,46 @@ and edit/subscribe/add friend buttons*/
     cursor: default;
 }
 
+.search_field {
+    background: inherit;
+    color: white;
+    font-family: "SF UI Display";
+    font-size: 14px;
+    border: none;
+    outline: none;
+}
 
+.friend_cell {
+    display: grid;
+    grid-auto-columns: 50px auto;
+    grid-gap: 0 10px;
+    padding: 20px 20px 20px 20px;
+    background: rgb(70, 70, 70);
+    border-radius: 10px;
+}
+
+.friend_text {
+    grid-row-start: 1;
+    grid-row-end: 1;
+    grid-column-start: 2;
+    grid-column-end: 2;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.friend_actions_menu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 10px 10px 10px;
+
+    background: inherit;
+    border-radius: 10px;
+
+    z-index: 3;
+
+    visibility: hidden;
+    transform: translate(-75%, -100%);
+    transition: 0.3s;
+}

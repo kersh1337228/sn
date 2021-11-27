@@ -139,8 +139,75 @@ if ($('.reply_icon')) {
     reply_button.click(reply_menu_switch)
 }
 
-if ($('#search_button')) {
-    $('.search_icon').click(()=> {
-        $('#search_button').click()
+if ($('#chat_search')) {
+    $('#chat_search').on('input paste', function () {
+        $.ajax({
+            type: 'GET',
+            url: `/chats/chat_list/search/`,
+            data: {'search': $(this).val()},
+            success: function (response) {
+                $('.chat_list_cell').replaceWith(
+                    `<div class="chat_list_cell">${response.chats}</div>`
+                )
+            },
+            error: function (response) {
+                alert('error')
+            }
+        })
+    })
+}
+
+if ($('#community_search')) {
+    $('#community_search').on('input paste', function () {
+        $.ajax({
+            type: 'GET',
+            url: `/communities/list/search/`,
+            data: {'search': $(this).val()},
+            success: function (response) {
+                $('.user_list_grid_cell_user_list').replaceWith(
+                    `<div class="user_list_grid_cell_user_list">
+                        ${response.communities}
+                     </div>`
+                )
+            },
+            error: function (response) {
+                alert('error')
+            }
+        })
+    })
+}
+
+if ($('#friend_search')) {
+    $('#friend_search').on('input paste', function () {
+        $.ajax({
+            type: 'GET',
+            url: `/friends/friend_list/search/`,
+            data: {'search': $(this).val()},
+            success: function (response) {
+                $('.user_list_grid_cell_user_list').replaceWith(
+                    `<div class="user_list_grid_cell_user_list">
+                        ${response.friends}
+                     </div>`
+                )
+            },
+            error: function (response) {
+                alert('error')
+            }
+        })
+    })
+}
+
+if($('.friend_actions_button')) {
+    $('.friend_actions_button').on('click', function () {
+        let friend_actions_menu = $(this).children('.friend_actions_menu')
+        if (friend_actions_menu.css('visibility') === 'visible') {
+            friend_actions_menu.css('visibility', 'hidden')
+            friend_actions_menu.css('opacity', '0')
+            friend_actions_menu.css('transform', 'translate(-75%, -100%)')
+        } else {
+            friend_actions_menu.css('visibility', 'visible')
+            friend_actions_menu.css('opacity', '1')
+            friend_actions_menu.css('transform', 'translate(-75%, -35%)')
+        }
     })
 }

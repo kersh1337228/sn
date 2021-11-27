@@ -3,12 +3,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import model_to_dict
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView, FormView
 from user.views import functionally_based_view_decorator
-from user_community.forms import CommunityCreateForm, CommunityEditForm, SearchForm
+from user_community.forms import CommunityCreateForm, CommunityEditForm
 from user_community.models import Community, CommunitySubscriber, CommunitySubscribeRequest
 from user_community.utils import get_community_state
 from user_note.forms import PostAddForm
@@ -140,33 +141,36 @@ class CommunityPageEditPostView(CommunityPageView):
 
 
 '''View on which the filtered list of communities is shown'''
-class CommunityListView(LoginRequiredMixin, ListView, FormView):
+class CommunityListView(LoginRequiredMixin, ListView):
     model = Community
     template_name = 'community_list.html'
     context_object_name = 'communities'
-    form_class = SearchForm
+    
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax():
+            communities_html = ''
+            community_list = []
+            if request.GET.get('search'):
+                community_list = Community.objects.filter(
+                    name__icontains=request.GET.get('search')
+                )
+            else:
+                community_list = request.user.community_subscribes.all()
+            if community_list:
+                for community in community_list:
+                    communities_html += render_to_string(
+                        'community_min.html',
+                        {'community': community,
+                         'request': request},
+                    )
+            else:
+                communities_html = 'No matching communities'
+            return JsonResponse({'communities': communities_html}, status=200)
+        else:
+            return super(CommunityListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
-        if self.kwargs.get('search'):
-            return Community.objects.filter(
-                name__contains=self.kwargs.get('search')
-            )
-        else:
-            return self.request.user.community_subscribes.all()
-
-    def get_initial(self):
-        initial = super().get_initial()
-        if self.kwargs.get('search'):
-            initial.update(
-                search_text=self.kwargs.get('search')
-            )
-        return initial
-
-    def form_valid(self, form):
-        return redirect(
-            'community_search_list',
-            search=form.cleaned_data.get('search_text')
-        )
+        return self.request.user.community_subscribes.all()
 
 
 '''View of community creation page'''
