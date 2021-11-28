@@ -16,7 +16,7 @@
         <div class="grid_cell_note_list">
             {% if notes %}
                 {% for note in notes %}
-                    {% post_tag type='note' post=note user=request.user note=note form=form %}
+                    {% post_tag type='note' post=note post_id=note.note_id user=request.user form=form %}
                 {% endfor %}
             {% else %}
                 No posts here

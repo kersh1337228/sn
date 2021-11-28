@@ -24,17 +24,18 @@
             {{ field }}
         {% endfor %}
         {% if type == 'comment' %}
-            <input type="text" name="{{ note.note_id }}" id="note_id">
+            <input type="text" name="{{ post.post_id }}" id="note_id">
         {% elif type == 'reply' %}
-            <input type="text" name="{{ comment.comment_id }}" id="note_id">
+            <input type="text" name="{{ post.post_id }}" id="note_id">
         {% elif type == 'message' %}
             <input type="text" name="{{ message.message_id }}" id="note_id">
         {% endif %}
         <button type="submit" class="send_message_button" name="{{ type }}_btn"></button>
         {% if type == 'message' %}
-            <img src="{% static 'icons/send_message_icon.png' %}" width="22px" height="22px" alt="" class="send_message_icon">
+            <img src="{% static 'icons/send_message_icon.png' %}"
+                 width="22px" height="22px" alt="" class="send_message_icon">
         {% else %}
-            <div class="send_message_icon">
+            <div class="send_{{ type }}_icon">
                 Post
             </div>
         {% endif %}

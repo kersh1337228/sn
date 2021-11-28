@@ -24,7 +24,7 @@ urlpatterns = [
     path('rest/', include('rest_framework.urls')),
 
     path('user/', include('user.urls'), name='user'),
-    path('feed/', include('user_note.urls'), name='user_note'),
+    path('note/', include('user_note.urls'), name='user_note'),
     path('media/', include('user_media.urls'), name='user_media'),
     path('friends/', include('user_friend.urls'), name='user_friend'),
     path('chats/', include('user_chat.urls'), name='user_chat'),

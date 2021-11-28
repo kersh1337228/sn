@@ -1,3 +1,12 @@
+function getFormData(form) {
+    var unindexed_array = form.serializeArray();
+    var indexed_array = {};
+    $.map(unindexed_array, function (n, i) {
+        indexed_array[n['name']] = n['value'];
+    });
+    return indexed_array;
+}
+
 if ($('.grid_cell_profile_actions_profile_picture')) {
     setInterval(()=>{
         let profile_picture = $('.grid_cell_profile_actions_profile_picture')
@@ -139,6 +148,21 @@ if ($('.reply_icon')) {
     reply_button.click(reply_menu_switch)
 }
 
+if($('.friend_actions_button')) {
+    $('.friend_actions_button').on('click', function () {
+        let friend_actions_menu = $(this).children('.friend_actions_menu')
+        if (friend_actions_menu.css('visibility') === 'visible') {
+            friend_actions_menu.css('visibility', 'hidden')
+            friend_actions_menu.css('opacity', '0')
+            friend_actions_menu.css('transform', 'translate(-75%, -100%)')
+        } else {
+            friend_actions_menu.css('visibility', 'visible')
+            friend_actions_menu.css('opacity', '1')
+            friend_actions_menu.css('transform', 'translate(-75%, -35%)')
+        }
+    })
+}
+
 if ($('#chat_search')) {
     $('#chat_search').on('input paste', function () {
         $.ajax({
@@ -197,17 +221,68 @@ if ($('#friend_search')) {
     })
 }
 
-if($('.friend_actions_button')) {
-    $('.friend_actions_button').on('click', function () {
-        let friend_actions_menu = $(this).children('.friend_actions_menu')
-        if (friend_actions_menu.css('visibility') === 'visible') {
-            friend_actions_menu.css('visibility', 'hidden')
-            friend_actions_menu.css('opacity', '0')
-            friend_actions_menu.css('transform', 'translate(-75%, -100%)')
-        } else {
-            friend_actions_menu.css('visibility', 'visible')
-            friend_actions_menu.css('opacity', '1')
-            friend_actions_menu.css('transform', 'translate(-75%, -35%)')
-        }
+if ($('img[class^="like_"]') || $('img[class^="dislike_"]')) {
+    let estimate = function () {
+        const action = $(this).attr('class').startsWith('like') ? 'like' : 'dislike'
+        let icon = $(this)
+        $.ajax({
+            type: 'POST',
+            url: `${window.location.origin}/user/post/${action}/`,
+            data: {
+                'type': icon.attr('class').match(/like_([\w]+)_icon$/)[1],
+                'id': icon.parent().attr('class')
+            },
+            success: function (response) {
+                let delta = 0
+                if(icon.attr('src').match(/([\w]+)_like_icon\.png$/)[1] === 'inactive') {
+                    icon.attr(
+                        'src',
+                        '/static/icons/active_like_icon.png'
+                    )
+                    delta = 1
+                } else {
+                    icon.attr(
+                        'src',
+                        '/static/icons/inactive_like_icon.png'
+                    )
+                    delta = -1
+                }
+                icon.siblings().last().text(
+                    icon.siblings().last().text().replace(
+                        /[\d]+/,
+                        `${parseInt(
+                            icon.siblings().last().text()
+                        ) + delta}`)
+                )
+                if (icon.attr('class').startsWith('like')) {
+                    icon.attr('class', 'dislike_note_icon')
+                } else {
+                    icon.attr('class', 'like_note_icon')
+                }
+            },
+            error: function (response) {
+                alert('error')
+            }
+        })
+    }
+    $('img[class^="like_"]').on('click', estimate)
+    $('img[class^="dislike_"]').on('click', estimate)
+}
+
+if ($('.send_note_icon')) {
+    $('.send_note_icon').on('click', function (event) {
+        event.preventDefault()
+        let data = getFormData($(this).parent().parent())
+        $.ajax({
+            type: 'POST',
+            url: `${window.location.origin}/note/create/`,
+            data: data,
+            success: function (response) {
+
+            },
+            error: function (response) {
+                alert('error')
+            }
+        })
     })
 }

@@ -40,7 +40,6 @@ class PostMixin(models.Model):
         blank=True,
         null=True
     )
-
     '''Statistics'''
     likes = models.ManyToManyField(
         'Like',
@@ -50,7 +49,6 @@ class PostMixin(models.Model):
         User,
         related_name='note_liked_by'
     )
-
     '''Media'''
     images = models.ManyToManyField(
         'user_media.Image',
@@ -67,6 +65,14 @@ class PostMixin(models.Model):
     files = models.ManyToManyField(
         'user_media.File',
         related_name='note_files',
+    )
+    '''id'''
+    post_id = models.SlugField(
+        verbose_name='Post ID',
+        max_length=255,
+        null=False,
+        blank=True,
+        unique=True,
     )
 
     def __str__(self):
@@ -89,23 +95,24 @@ class Note(PostMixin):
         blank=True,
         default=0
     )
-    '''id'''
-    note_id = models.SlugField(
-        verbose_name='Note ID',
-        max_length=255,
-        null=False,
-        blank=True,
-        unique=True,
-    )
 
-    def save(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        super(Note, self).__init__(*args, **kwargs)
         if not self.note_id:
             now = datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
-            if self.user:
-                self.note_id = f'{self.user.user_id}_note_{now}'
+            if kwargs.get('user'):
+                self.note_id = f'{kwargs.get("user").user_id}_note_{now}'
             else:
-                self.note_id = f'{self.community.community_id}_note_{now}'
+                self.note_id = f'{kwargs.get("community").community_id}_note_{now}'
+
+
+    def save(self, *args, **kwargs):
         super(Note, self).save(*args, **kwargs)
+        if self.user:
+            self.user.notes.add(self)
+        else:
+            self.community.notes.add(self)
+
 
 
 '''User or community comment'''
@@ -120,14 +127,6 @@ class Comment(PostMixin):
         null=True,
         blank=True,
         related_name='commented_note'
-    )
-    '''id'''
-    comment_id = models.SlugField(
-        verbose_name='Comment ID',
-        max_length=255,
-        null=False,
-        blank=True,
-        unique=True,
     )
 
     def save(self, *args, **kwargs):
@@ -145,14 +144,6 @@ class Reply(PostMixin):
         null=True,
         blank=True,
         related_name='comment_replied'
-    )
-    '''id'''
-    reply_id = models.SlugField(
-        verbose_name='Reply ID',
-        max_length=255,
-        null=False,
-        blank=True,
-        unique=True,
     )
 
     def save(self, *args, **kwargs):

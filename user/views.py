@@ -1,6 +1,9 @@
 import datetime
 from django.contrib.auth import login, get_user_model
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
@@ -8,13 +11,16 @@ from django.forms import model_to_dict
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView, FormView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.response import Response
+
 from user.forms import UserRegisterForm, UserAuthenticationForm, UserMainDataEditForm, \
     UserBasicPersonalDataEditForm, UserContactDataEditForm, UserInterestsEditForm, \
     UserEducationAndSpecializationEditForm, UserDataVisibilityEditForm
 from user.utils import UserViewMixin, get_user_state, UserEditMixin
 from user_note.forms import PostAddForm
 from user_note.models import Note, Like, Comment, Reply
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 
 
 User = get_user_model()
@@ -67,6 +73,69 @@ class UserPageMixin(LoginRequiredMixin, UserViewMixin, TemplateView, FormView):
             self.request.user,
         )
         return context
+
+
+class PostAPIMixin(
+    LoginRequiredMixin,
+    CreateAPIView,
+    RetrieveUpdateDestroyAPIView
+):
+    type = None
+    model = None
+
+    def get_owner(self):
+        pass
+
+    # Get post model object
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax():
+            self.model.objects.get(
+                **{f'{self.type}_id': request.data.get('id')}
+            )
+
+    # Create post model object
+    def post(self, request, *args, **kwargs):
+        data = request.data.copy()
+        data.pop('csrfmiddlewaretoken')
+        if request.is_ajax():
+            post = self.model.objects.create(**data, owner=self.get_owner())
+            return Response({
+                'post_html': render_to_string(
+                    'post.html',
+                    {
+                        'type': self.type,
+                        'post': post,
+                    }
+                )
+            }, status=200)
+
+    # Update post model object
+    def patch(self, request, *args, **kwargs):
+        if request.is_ajax():
+            self.model.objects.filter(
+                **{f'{self.type}_id': request.data.get('id')}
+            ).update(
+                **request.data
+            )
+
+    # Delete post model object
+    def delete(self, request, *args, **kwargs):
+        if request.is_ajax():
+            self.model.objects.get(
+                **{f'{self.type}_id': request.data.get('id')}
+            ).delete()
+
+    # Replace post model object
+    def put(self, request, *args, **kwargs):
+        pass
+
+
+class NoteAPIView(PostAPIMixin):
+    type = 'note'
+    model = Note
+
+    def get_owner(self):
+        return
 
 
 '''
@@ -179,9 +248,11 @@ def delete_view(request, **kwargs):
     return redirect(request.META['HTTP_REFERER'])
 
 
+@csrf_exempt
 @login_required
 @functionally_based_view_decorator
 def like_view(request, **kwargs):
+    print(request.POST, kwargs)
     def like(type, model, id, action):
         object = get_object_or_404(
             model,
@@ -203,28 +274,17 @@ def like_view(request, **kwargs):
             )
             like.delete()
             object.liked_by.remove(request.user)
-    if kwargs.get('reply_id'):
-        like(
-            'reply',
-            Reply,
-            kwargs.get('reply_id'),
-            kwargs.get('action'),
-        )
-    elif kwargs.get('comment_id'):
-        like(
-            'comment',
-            Comment,
-            kwargs.get('comment_id'),
-            kwargs.get('action'),
-        )
-    elif kwargs.get('note_id'):
-        like(
-            'note',
-            Note,
-            kwargs.get('note_id'),
-            kwargs.get('action'),
-        )
-    return redirect(request.META['HTTP_REFERER'])
+    like(
+        request.POST.get('type'),
+        {
+            'note': Note,
+            'comment': Comment,
+            'reply': Reply
+        }.get(request.POST.get('type')),
+        request.POST.get('id'),
+        kwargs.get('action'),
+    )
+    return JsonResponse({}, status=200)
 
 
 '''

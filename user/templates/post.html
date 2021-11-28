@@ -15,7 +15,7 @@
             {% endif %}
         </div>
         <div>
-            {% post_edit_menu_tag type=type community_id=community.community_id user_id=user.user_id note_id=note.note_id comment_id=comment.comment_id reply_id=reply.reply_id %}
+            ...
         </div>
     </div>
     <br><div>{{ post.text }}</div><br>
@@ -24,8 +24,17 @@
         <div class="note_time">Last edited: {{ post.update_time|date:'d-m-Y H:i:s' }}</div>
     {% endif %}
     <br><div class="note_statistics">
-            <div>
-                {% post_like_tag type=type post=post user=user note=note comment=comment reply=reply %}
+            <div class="{{ post_id }}">
+                {% if not user in post.liked_by.all %}
+                    <img src="{% static 'icons/inactive_like_icon.png' %}"
+                         alt="" width="15px" height="15px"
+                         class="like_{{ type }}_icon">
+                {% else %}
+                    <img src="{% static 'icons/active_like_icon.png' %}"
+                         alt="" width="15px" height="15px"
+                         class="dislike_{{ type }}_icon">
+                {% endif %}
+                <span>{{ post.likes.all|length }}</span>
             </div>
         {% if type == 'note' %}
             <div>
@@ -47,23 +56,23 @@
             <br><div class="note_comments">
                 {% if post.comments.all %}
                     {% for comment in post.comments.all %}
-                        {% post_tag type='comment' post=comment user=user community=community comment=comment note=note form=form %}
+                        {% post_tag type='comment' post=comment user=user community=community note=post form=form %}
                     {% endfor %}
                 {% else %}
                     No comments yet
                 {% endif %}
-                {% form_tag form=form type='comment' note=note comment=comment %}
+                {% form_tag form=form type='comment' post=post %}
             </div>
         {% elif type == 'comment' %}
            <br><div class="comment_replies">
                 {% if post.replies.all %}
                     {% for reply in post.replies.all %}
-                        {% post_tag type='reply' post=reply user=user community=community note=note comment=comment reply=reply %}
+                        {% post_tag type='reply' post=reply user=user community=community note=note comment=post %}
                     {% endfor %}
                 {% else %}
                     No replies yet
                 {% endif %}
-                {% form_tag form=form type='reply' note=note comment=comment %}
+                {% form_tag form=form type='reply' post=post %}
             </div>
         {% endif %}
     {% endif %}

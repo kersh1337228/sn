@@ -19,10 +19,6 @@ def post_edit_menu_tag(**kwargs):
     return kwargs
 
 
-@register.inclusion_tag('like.html')
-def post_like_tag(**kwargs):
-    return kwargs
-
 
 @register.inclusion_tag('form.html')
 def form_tag(**kwargs):
